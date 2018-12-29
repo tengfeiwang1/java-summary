@@ -1,0 +1,44 @@
+java性能优化：
+1.countdownlatch；
+2.jvisualvm dump分析；
+远程配置jmx：启动脚本添加-Djava.rmi.server.hostname=0.0.0.0 
+-Dcom.sun.management.jmxremote.port=18999 -Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.authenticate=false
+jvisualvm 添加远程主机并配置jmx链接；
+
+3.linux命令监控：jmap，jstack，
+
+
+-------------应用程序占用资源高问题-----------
+1.jvm性能调优-找出占用cpu较大的代码段：
+使用jdk自带的jstack工具分析
+1.得到test进程id：
+ps -ef | grep test | grep -v grep
+结果：root    21711     1  1 14:47 pts/3    00:02:10 java -jar test.jar
+[针对java程序使用jps查看进程id];
+
+2.找出该进程内最耗费CPU的线程，
+可以使用ps -Lfp pid
+或者ps -mp pid -o THREAD, tid, time | sort -rn
+或者top -Hp pid查看占用资源的线程
+此处选择使用 top -Hp pid找到消耗资源最多的线程：21742;
+
+ 得到该进行的十六进制值：printf "%x\n" 21742   结果：54ee
+
+3.jstack
+进程21711的堆栈信息 jstack 21711 | grep 54ee -A 30,(30行)
+结果："PollIntervalRetrySchedulerThread"?prio=10?tid=0x00007f950043e000?nid=0x54ee?in?Object.wait()?[0x00007f94c6eda000]
+优化类：PollIntervalRetrySchedulerThread
+
+可以查看某个进程的当前线程栈运行情况。根据这个命令的输出可以定位某个进程的所有线程的当前运行状态、运行代码，以及是否死锁等等。
+
+
+2.jvm性能调优-找出占用内存较大的代码段：
+ 1 top命令：可以查看实时的内存使用情况。  
+
+ 2.jmap -histo:live [pid]，然后分析具体的对象数目和占用内存大小，从而定位代码。
+
+ 3.jmap -dump:live,format=b,file=xxx.xxx [pid]，然后利用MAT工具分析是否存在内存泄漏等等。
+
+jmap
+导出jmap文件：jmap -histo:133 >> jmap.txt
