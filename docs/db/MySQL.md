@@ -1,31 +1,96 @@
-## MySQL常用引擎
-1. InnoDB
+#范式
+
+# MySQL常用引擎
+## InnoDB
    InnoDB的存储文件有两个，后缀分别是.frm和.idb，其中.frm是表的定义文件，而.idb是数据文件。
    InnoDB中存在**表锁和行锁**，不过行锁是在命中索引的情况下才会起作用。
    InnoDB**支持事务**，且支持四种隔离级别（读未提交，读已提交，可重复读，串行化），默认的为可重复读；而在Oracle数据库中，只支持串行化和读已提交这两种级别，其中默认为读已提交级别。
+
 >> InnoDB支持行锁（锁定字段含有索引的情况下，否则走表锁），但锁定方式并非简单的锁定指定行上的索引，而是分为3种锁定算法：
-1）记录锁（Record Locks）：锁定指定行的索引项
-2）Gap Locks：锁定某一个范围内的索引，但不包括记录本身
-3）间隙锁定（Next-Key Locks）：锁定一个范围内的索引，并且锁定记录本身   Next-Key Locks = Record Locks + Gap Locks
-A next-key lock is a combination of a record lock on the index record and a gap lock on the gap before the index record
+>>1) 行锁(Record Locks)：锁定指定行的索引项
+>>2) 间隙锁(Gap Locks)：锁定某一个范围内的索引，但不包括记录本身. GAP锁的目的，是为了防止同一事务的两次当前读，出现幻读的情况。
+>>3) Next-Key Locks：锁定一个范围内的索引，并且锁定记录本身. 对于行的查询，都是采用该方法，主要目的是解决幻读的问题。(Next-Key Locks = Record Locks + Gap Locks)
 
- 避免幻读：
- 1. 使用一种next-key-locking的策略来避免幻读;
- 2. MVCC:多版本并发控制
+**Next-Key Locks当使用主键索引进行当前读的时候，会降级为Record lock(行锁)**
 
-2. Myisam
+ ### 避免幻读：
+ 1. MVCC: (Multi-Version Concurrency Control) 多版本并发控制
+   MVCC最大的好处，相信也是耳熟能详：读不加锁，读写不冲突.
+
+    在MVCC并发控制中，读操作可以分成两类：快照读 (snapshot read)与当前读 (current read)。快照读，读取的是记录的可见版本 (有可能是历史版本)，**不用加锁**。当前读，读取的是记录的最新版本，并且，当前读返回的记录，都会加上锁，保证其他事务不会再并发修改这条记录。
+
+* 快照读：简单的select操作，属于快照读，不加锁。(当然，也有例外，下面会分析)
+
+    select * from table where ?;
+
+* 当前读：特殊的读操作，插入/更新/删除操作，属于当前读，需要加锁。
+
+    **select * from table where ? lock in share mode;**
+
+    select * from table where ? for update;
+
+    insert into table values (…);
+
+    update table set ? where ?;
+
+    delete from table where ?;
+
+所有以上的语句，都属于当前读，读取记录的最新版本。并且，读取之后，还需要保证其他并发事务不能修改当前记录，对读取记录加锁。其中，除了第一条语句，对读取记录加S锁 (共享锁)外，其他的操作，都加的是X锁 (排它锁)。
+next-key-locking
+
+ 2. LBCC：(Lock-Based Concurrency Control) 基于锁的并发控制
+  效率较低
+
+## Myisam
    Myisam的存储文件有三个，后缀分别是.frm, .MYD, .MYI，其中.frm是表的定义文件，.MYD是数据库文件，.MYI是索引文件。
    Myisam**只支持表锁**，且**不支持事务**。Myisam由于有单独的索引文件，在读取数据方面的性能很高。
 
-## 存储结构
+
+
+# 事务
+## 隔离级别:Isolation Level-0MySQL/InnoDB定义的4种隔离级别：
+* Read Uncommited
+ 
+    可以读取未提交记录。此隔离级别，不会使用，忽略。
+* Read Committed (RC)
+   
+    快照读忽略，本文不考虑。
+
+    针对**当前读**，RC隔离级别保证对读取到的记录加锁 (记录锁)，存在幻读现象。
+* Repeatable Read (RR)：同一个事务内，无论执行多少次相同Query查询的结果是一样的
+
+    快照读忽略，本文不考虑。
+
+    针对**当前读**，RR隔离级别保证对读取到的记录加锁 (记录锁)，同时保证对读取的范围加锁，新的满足查询条件的记录不能够插入 (间隙锁)，不存在幻读现象。
+* Serializable
+
+    从MVCC并发控制退化为基于锁的并发控制。不区别快照读与当前读，所有的读操作均为当前读，读加读锁 (S锁)，写加写锁 (X锁)。可以保证不同事务之间的互斥，只允许并发的读，并发写是被禁止的。
+
+    Serializable隔离级别下，读写冲突，因此并发度急剧下降，在MySQL/InnoDB下不建议使用。
+
+## MySQL 的脏读，不可重复读，幻读
+
+* 脏读: 一个事务内修改了数据但是还没有提交，这个时候另外一个事务可以读取得到这个未提交的数据，这个样子就被称之为脏读。
+* 不可重复读: 一个线程的事务读取到了另外一个线程中提交的update的数据。
+* 幻读: 一个线程中的事务读取到了另外一个事务insert的数据。
+
+### ACID属性
+* 原子性（Atomicity）：一个事务被视为一个不可分割的最小单元，事务里面的操作，要么全都执行，要么全部失败回滚。
+* 一致性（Consistent）：一个事务的执行不应该破坏数据库的完整性约束；在事务开始和完成时，数据都必须保持一致状态。这意味着所有相关的数据规则都必须应用于事务的修改，以保持数据的完整性；事务结束时，所有的内部数据结构（如B树索引或双向链表）也都必须是正确的。
+* 隔离性（Isolation）：事务之间的行为不应该互相影响；数据库系统提供一定的隔离机制，保证事务在不受外部并发操作影响的"独立"环境执行。这意味着事务处理过程中的中间状态对外部是不可见的，反之亦然。
+* 持久性（Durable）：事务提交之后，需要将提交的事务持久化到磁盘。即使系统崩溃，提交的数据也不应该丢失。
+
+
+# 存储结构
 InnoDB和Myisam都是用B+Tree来存储数据的。
 
-### InnoDB索引结构
+## InnoDB索引结构
 
-### Myisam索引结构
+## Myisam索引结构
 
+#索引
+聚簇索引
+非聚簇索引
 
-范式
-
-事务
-优化
+#优化
+1. InnoDB_row_lock状态变量来分析系统上的行锁的争夺情况：show status like 'innodb_row_lock%';
