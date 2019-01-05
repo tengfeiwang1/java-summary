@@ -102,7 +102,9 @@ InnoDB 通过 B+Tree 结构对 ID 建索引，然后在叶子节点中存储记�
 Myisam 引擎也是采用的 B+Tree 结构来作为索引结构。
 由于 Myisam 中的索引和数据分别存放在不同的文件，所以在索引树中的叶子节点中存的数据是该索引对应的数据记录的地址，由于*数据与索引不在一起*，所以 Myisam 是非聚簇索引。
 
-
+##索引使用策略及优化
+最左前缀索引
+[](https://cloud.tencent.com/developer/article/1125452)
 
 #优化
 1. InnoDB_row_lock状态变量来分析系统上的行锁的争夺情况：show status like 'innodb_row_lock%';
