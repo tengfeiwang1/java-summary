@@ -4,7 +4,7 @@
 简单来说 Redis 就是一个数据库，不过与传统数据库不同的是 redis 的数据是存在内存中的，所以存写速度非常快，因此 redis 被广泛应用于缓存方向。另外，redis 也经常用来做分布式锁。redis 提供了多种数据类型来支持不同的业务场景。除此之外，redis 支持事务 、持久化、LUA脚本、LRU驱动事件、多种集群方案。
 * Redis 与其他 key - value 缓存产品有以下三个特点
  1. Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。 
- 2. Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
+ 2. Redis不仅仅支持简单的key-value类型的数据，同时还提供string,list，set，sorted set(zset)，hash等数据结构的存储。
  3. Redis支持数据的备份，即master-slave模式的数据备份。
 
 ## Redis 事务
