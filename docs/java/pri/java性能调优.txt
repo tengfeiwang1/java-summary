@@ -7,7 +7,14 @@ java性能优化：
 jvisualvm 添加远程主机并配置jmx链接；
 
 3.linux命令监控：jmap，jstack，
+iostat:iostat用于监视CPU使用率和I/O系统，
+iostat -c：查看cpu；
 
+vmstat:vmstat用于监视内存使用；
+
+jsat:可以查看堆内存各部分使用量，以及加载类的数量。
+
+jstat -gcutil pid:总垃圾回收统计
 
 -------------应用程序占用资源高问题-----------
 1.jvm性能调优-找出占用cpu较大的代码段：
