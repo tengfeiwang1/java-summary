@@ -17,7 +17,7 @@ vmstat:vmstat用于监视内存使用；
 
 jsat:可以查看堆内存各部分使用量，以及加载类的数量。
 
-jstat -gcutil pid:总垃圾回收统计
+jstat -gcutil pid:总垃圾回收统计-分析fullgc和老年代gc次数和时间
 
 -------------应用程序占用资源高问题-----------
 1.jvm性能调优-找出占用cpu较大的代码段：
