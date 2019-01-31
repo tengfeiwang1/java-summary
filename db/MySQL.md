@@ -90,6 +90,15 @@ ble）：事务提交之后，需要将提交的事务持久化到磁盘。即�
 
     Serializable隔离级别下，读写冲突，因此并发度急剧下降，在MySQL/InnoDB下不建议使用。
 
+# 日志
+https://www.linuxidc.com/Linux/2018-01/150614.htm
+
+* MySQL中有六种日志文件，分别是：事务日志(重做日志（redo log）、回滚日志（undo log）)、二进制日志（binlog）、错误日志（errorlog）、慢查询日志（slow query log）、一般查询日志（general log），中继日志（relay log）。
+
+## 重做日志（redo log）
+## 回滚日志（undo log）
+## 二进制日志（bin log）
+
 # 存储结构
 InnoDB和Myisam都是用B+Tree来存储数据的。
 
@@ -133,7 +142,7 @@ Myisam 引擎也是采用的 B+Tree 结构来作为索引结构。
 
 如果出现死锁，可以用**SHOW INNODB STATUS**命令来确定最后一个死锁产生的原因。返回结果中包括死锁相关事务的详细信息，如引发死锁的SQL语句，事务已经获得的锁，正在等待什么锁，以及被回滚的事务等。据此可以分析死锁产生的原因和改进措施。
 
-SHOW INNODB STATUS使用步骤
+>> SHOW INNODB STATUS使用步骤
 1. CREATE TABLE innodb_monitor(a INT) ENGINE=INNODB;
 打开监视器以后，默认情况下每15秒会向日志中记录监控的内容，如果长时间打开会导致.err文件变得非常的巨大，所以用户在确认问题原因之后，要记得删除监控表以关闭监视器
 2. Show innodb status\G;
