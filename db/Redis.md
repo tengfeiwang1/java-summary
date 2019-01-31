@@ -12,8 +12,8 @@
 * 在传统的关系式数据库中，常常用 ACID 性质来检验事务功能的可靠性和安全性。在 Redis 中，事务总是具有原子性（Atomicity)、一致性(Consistency)和隔离性（Isolation），并且当 Redis 运行在某种特定的持久化模式下时，事务也具有持久性（Durability）。
 
 ## 持久化方式RDB,AOF
-* AOF会消耗一部分性能，但是可以提高缓存一致性
-* RDS 提高频繁写性能，不启用备份来换取性能（可以通过save命令做备份）
+* AOF 会消耗一部分性能，但是可以提高缓存一致性
+* RDB 提高频繁写性能，不启用备份来换取性能（可以通过save命令做备份）
 
 1.解决redis aof文件过大的问题 
 执行BGREWRITEAOF命令对redis的AOF进行重写

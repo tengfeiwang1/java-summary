@@ -12,3 +12,12 @@
 
 
 CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性），三者不可兼得。 
+
+
+2019-1-31
+1. kafka streaming聚合统计操作的原理，自己如何实现
+2. redis的持久化方案 aof  ，rdb
+3. redis相关的内存数据库-mongodb，leveldb（写性能快于读，读也不慢），memcached(单节点)
+4. 为什么选redis不选择其他数据库？
+5. kafka为什么可以提供大量的，快速的数据传输？---顺序写入（快速写），内存transfile（快速读）
+6. 流式处理如何设计--参考mapreduce
