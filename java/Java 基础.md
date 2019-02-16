@@ -11,7 +11,7 @@ public static Integer valueOf(int i) {
     return new Integer(i);
 }
 ```
-tips:
+* tips:
 基本类型对应的缓冲池如下：
 boolean values true and false
 all byte values
@@ -42,7 +42,7 @@ Class clazz = Class.forName("com.test.Person");
 >> 代理(Proxy)是一种设计模式,提供了对目标对象另外的访问方式;即通过代理对象访问目标对象.这样做的好处是:可以在目标对象实现的基础上,增强额外的功能操作,即扩展目标对象的功能.
 >>> 代理模式的关键点是:代理对象与目标对象.代理对象是对目标对象的扩展,并会调用目标对象
 
-https://www.cnblogs.com/cenyu/p/6289209.html
+[代理模式参考链接](https://www.cnblogs.com/cenyu/p/6289209.html)
 
 ## 静态代理
 * 静态代理在使用时,*需要定义接口或者父类*,被代理对象与代理对象一起实现相同的接口或者是继承相同父类.
@@ -60,7 +60,7 @@ https://www.cnblogs.com/cenyu/p/6289209.html
 
 * 代理类所在包:java.lang.reflect.Proxy
 JDK实现代理只需要使用newProxyInstance方法,但是该方法需要接收三个参数,完整的写法是:
- ``` 
+ ``` java
  static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces,InvocationHandler h )
  ```
  >> 注意该方法是在Proxy类中是静态方法,且接收的三个参数依次为:
@@ -80,7 +80,7 @@ JDK实现代理只需要使用newProxyInstance方法,但是该方法需要接收
 * Cglib包的底层是通过使用一个小而快的字节码处理框架ASM来转换字节码并生成新的类.不鼓励直接使用ASM,因为它要求你必须对JVM内部结构包括class文件的格式和指令集都很熟悉.
 
 >> Cglib子类代理实现方法:
-1. 需要引入cglib的jar文件,但是Spring的核心包中已经包括了Cglib功能,所以直接引入pring-core-3.2.5.jar即可.
+1. 需要引入cglib的jar文件,但是Spring的核心包中已经包括了Cglib功能,所以直接引入spring-core-3.2.5.jar即可.
 2. 引入功能包后,就可以在内存中动态构建子类
 3. **代理的类不能为final,否则报错**(final类 不能继承)
 4. 目标对象的方法如果为final/static,那么就不会被拦截,即不会执行目标对象额外的业务方法.
@@ -91,7 +91,7 @@ JDK实现代理只需要使用newProxyInstance方法,但是该方法需要接收
 
 一致性hash特性
 1. 平衡性(Balance)
-2。 单调性(Monotonicity)：单调性是指如果已经有一些内容通过哈希分派到了相应的缓冲中，又有新的缓冲加入到系统中。哈希的结果应能够保证原有已分配的内容可以被映射到原有的或者新的缓冲中去，而不会被映射到旧的缓冲集合中的其他缓冲区。 
+2. 单调性(Monotonicity)：单调性是指如果已经有一些内容通过哈希分派到了相应的缓冲中，又有新的缓冲加入到系统中。哈希的结果应能够保证原有已分配的内容可以被映射到原有的或者新的缓冲中去，而不会被映射到旧的缓冲集合中的其他缓冲区。 
 3. 分散性 (Spread)
 4. 负载性 (Load) 
 5. 平滑性(Smoothness)
