@@ -59,3 +59,11 @@ JDK1.7升级了NIO类库，升级后的NIO类库被称为NIO2.0，引人注目�
 
 ![四大文件操作对比](./pic/四大文件操作对比.png)
 nio使内存映射文件变得简单：[参考](https://www.cnblogs.com/ixenos/p/5863921.html)
+
+## Netty
+Netty是一个高性能 事件驱动的异步的非堵塞的IO(NIO)框架，用于建立TCP等底层的连接，基于Netty可以建立高性能的Http服务器。支持HTTP、 WebSocket 、Protobuf、 Binary TCP |和UDP，Netty已经被很多高性能项目作为其Socket底层基础，如HornetQ Infinispan Vert.x
+Play Framework Finangle和 Cassandra。其竞争对手是：Apache MINA和 Grizzly。
+
+Netty原理和使用：https://www.jdon.com/concurrent/netty.html
+IO和NIO对比：https://www.jianshu.com/p/a4e03835921a
+http://www.sohu.com/a/272879207_463994

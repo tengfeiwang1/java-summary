@@ -50,3 +50,7 @@ AOF重写作用：
 Java工程师面试突击第1季（可能是史上最好的Java面试突击课程）-中华石杉老师。视频地址见下面！ 
 链接： https://pan.baidu.com/s/18pp6g1xKVGCfUATf_nMrOA
 密码：5i58
+
+
+
+redis为什么快：https://www.sohu.com/a/295050863_463994?sec=wd
