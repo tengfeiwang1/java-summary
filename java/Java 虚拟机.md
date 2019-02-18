@@ -3,11 +3,11 @@ jstat
 
 # JVM内存结构
 ## JVM运行态数据分区
-//todo
+//todo  
 ## 内存模型JMM
 //todo
 
-# GC垃圾回收
+# GC垃圾回收算法
 
 
 # 类加载机制

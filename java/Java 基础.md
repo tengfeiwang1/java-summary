@@ -1,3 +1,5 @@
+todo  补上基础知识
+https://github.com/Snailclimb/JavaGuide/blob/master/Java%E7%9B%B8%E5%85%B3/Java%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md
 # 一 基本类型
 ## 缓存池
 new Integer(123) 与 Integer.valueOf(123) 的区别在于：
@@ -19,6 +21,12 @@ short values between -128 and 127
 int values between -128 and 127
 char in the range \u0000 to \u007F
 
+# Java关键字
+## final
+
+## static
+## this
+## super
 
 # 反射
 >> Reflection:Java反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为Java语言的反射机制。
