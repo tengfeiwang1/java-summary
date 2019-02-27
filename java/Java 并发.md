@@ -44,19 +44,19 @@ Executors-默认线程池参数
 # 3.并发包
 ## 3. 1 J.U.C
 ![参考文档](./pri/知识点20181126.docx)
-AQS
+### AQS--AbstractQueuedSynchronizer
+
+### 并发集合---concurrent
+
+### 原子性--Atomic
 
 
-countdownlatch
-信号量
+CountDownLatch
+
+信号量-semphere
 
 
-并发集合
-concurrent----
-
-Atomic
-
-## 3. 2 BlockingQueue
+## 3. 2 BlockingQueue--阻塞队列
 
 java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 * FIFO 队列 ：LinkedBlockingQueue、ArrayBlockingQueue（固定长度）

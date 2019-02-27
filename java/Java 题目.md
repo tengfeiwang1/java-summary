@@ -16,6 +16,9 @@ CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（
 记录1
 如何排查服务可用性问题：
 http://www.importnew.com/27436.html
+服务慢排查的另一种方法：生成java core和heap dump
+命令：kill  -3 pid
+https://www.cnblogs.com/jingmoxukong/p/5509196.html
 
 2019-1-31记录2
 1. kafka streaming聚合统计操作的原理，自己如何实现---提交job
