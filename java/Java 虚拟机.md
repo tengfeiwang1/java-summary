@@ -9,6 +9,11 @@ jstat
 
 # GC垃圾回收算法
 
+串行
+并行
+并发
+G1并发
+
 
 # 类加载机制
 ![类的生命周期](./pic/loadclass.png)
@@ -33,11 +38,18 @@ JVM在加载类时默认采用的是双亲委派机制。通俗的讲，就是�
 
 
 # 服务响应慢的处理方式：
+[参考操作系统](服务慢(无响应)排查方法)
 http://www.importnew.com/27436.html
-
+heap dump查看：https://www.cnblogs.com/jingmoxukong/p/5509196.html
+java 产生core文件：kill -3 pid
 一般来说，需要获取的信息大概分几类：
 1. 服务表现：问题的具体表现（出错、超时等）、应用日志、依赖服务的状态等
 2. 系统状态：操作系统指标（系统管理的各种资源的状态(端口连接数，服务连接数)、系统日志等）、jvm指标（主要是gc）
 3. 硬件指标：cpu、内存、网络、硬盘是否达到瓶颈
 
 # 虚拟机性能监控和故障处理
+jstat
+jmap
+jstack
+
+heap dump： jmap ， kill -3 pid

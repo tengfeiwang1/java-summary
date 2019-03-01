@@ -18,19 +18,115 @@ Executors-默认线程池参数
 ![线程池处理流程](./pic/线程池处理流程.jpg)
 ## 参数含义
  1. corePoolSize（线程池的基本大小）
-当提交一个任务到线程池时，线程池会创建一个线程来执行任务，即使其他空闲的基本线程能够执行新任务也会创建线程，等到需要执行的任务数大于线程池基本大小时就不再创建。如果调用了线程池的prestartAllCoreThreads方法，线程池会提前创建并启动所有基本线程。
+
+    当提交一个任务到线程池时，线程池会创建一个线程来执行任务，即使其他空闲的基本线程能够执行新任务也会创建线程，等到需要执行的任务数大于线程池基本大小时就不再创建。如果调用了线程池的prestartAllCoreThreads方法，线程池会提前创建并启动所有基本线程。
 2. runnableTaskQueue（任务队列）
-用于保存等待执行的任务的阻塞队列。可以选择以下几个阻塞队列。
-    ArrayBlockingQueue：是一个基于数组结构的有界阻塞队列，此队列按 FIFO（先进先出）原则对元素进行排序。
-    LinkedBlockingQueue：一个基于链表结构的阻塞队列，此队列按FIFO （先进先出） 排序元素，吞吐量通常要高于ArrayBlockingQueue。
-    SynchronousQueue：一个不存储元素的阻塞队列。每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，吞吐量通常要高于LinkedBlockingQueue。
-    PriorityBlockingQueue：一个具有优先级得无限阻塞队列。
+
+   用于保存等待执行的任务的阻塞队列。可以选择以下几个阻塞队列。
+     - ArrayBlockingQueue：是一个基于数组结构的有界阻塞队列，此队列按 FIFO（先进先出）原则对元素进行排序。
+     - LinkedBlockingQueue：一个基于链表结构的阻塞队列，此队列按FIFO （先进先出） 排序元素，吞吐量通常要高于ArrayBlockingQueue。
+     - SynchronousQueue：一个不存储元素的阻塞队列。每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，吞吐量通常要高于LinkedBlockingQueue。
+     - PriorityBlockingQueue：一个具有优先级得无限阻塞队列。
+
+* tips:LinkedBlockingQueue和ArrayBlockingQueue的异同
+         
+    - 相同：
+
+        1. LinkedBlockingQueue和ArrayBlockingQueue都实现了BlockingQueue接口；
+
+        2. LinkedBlockingQueue和ArrayBlockingQueue都是可阻塞的队列
+        
+        3. 内部都是使用ReentrantLock和Condition来保证生产和消费的同步；
+        4. 当队列为空，消费者线程被阻塞；当队列装满，生产者线程被阻塞；
+        5. 使用Condition的方法来同步和通信：await()和signal()
+
+    -  不同:
+        1. 锁机制不同
+        
+        LinkedBlockingQueue中的锁是分离的，生产者的锁PutLock，消费者的锁takeLock
+    ```java  
+    /** Lock held by take, poll, etc */
+    private final ReentrantLock takeLock = new ReentrantLock();
+
+    /** Wait queue for waiting takes */
+    private final Condition notEmpty = takeLock.newCondition();
+
+    /** Lock held by put, offer, etc */
+    private final ReentrantLock putLock = new ReentrantLock();
+
+    /** Wait queue for waiting puts */
+    private final Condition notFull = putLock.newCondition();
+    ```
+        ArrayBlockingQueue生产者和消费者使用的是同一把锁； 
+    ``` java
+        /** Main lock guarding all access */
+    final ReentrantLock lock;
+
+    /** Condition for waiting takes */
+    private final Condition notEmpty;
+
+    /** Condition for waiting puts */
+    private final Condition notFull;
+   ```
+    2. 底层实现机制不同
+        LinkedBlockingQueue内部维护的是一个链表结构,在生产和消费的时候，需要创建Node对象进行插入或移除，大批量数据的系统中，其对于GC的压力会比较大
+    ```java
+     /**
+     * Linked list node class
+     */
+    static class Node<E> {
+        E item;
+
+        /**
+         * One of:
+         * - the real successor Node
+         * - this Node, meaning the successor is head.next
+         * - null, meaning there is no successor (this is the last node)
+         */
+        Node<E> next;
+
+        Node(E x) { item = x; }
+    }
+        /**
+     * Head of linked list.
+     * Invariant: head.item == null
+     */
+    transient Node<E> head;
+
+    /**
+     * Tail of linked list.
+     * Invariant: last.next == null
+     */
+    private transient Node<E> last;
+    ```
+       ArrayBlockingQueue内部维护了一个数组,在生产和消费的时候，是直接将枚举对象插入或移除的，不会产生或销毁任何额外的对象实例
+    ```java
+     /** The queued items */
+    final Object[] items;
+    ```
+    3. 构造时候不同
+        
+       LinkedBlockingQueue有默认的容量大小为：Integer.MAX_VALUE，当然也可以传入指定的容量大小
+
+       ArrayBlockingQueue在初始化的时候，必须传入一个容量大小的值
+    4. 执行clear()方法时不同
+       LinkedBlockingQueue执行clear方法时，会加上两把锁fullLock():putLock(),takeLock();
+
+       ArrayBlockingQueue只有lock.
+    5. 统计元素个数
+    
+        LinkedBlockingQueue中使用了一个AtomicInteger对象来统计元素的个数
+
+    　　ArrayBlockingQueue则使用int类型来统计元素
+       
+
 3. maximumPoolSize（线程池最大大小）
 线程池允许创建的最大线程数。如果队列满了，并且已创建的线程数小于最大线程数，则线程池会再创建新的线程执行任务。值得注意的是如果使用了无界的任务队列这个参数就没什么效果。
 4. ThreadFactory：用于设置创建线程的工厂
-可以通过线程工厂给每个创建出来的线程设置更有意义的名字，Debug和定位问题时非常又帮助。
+可以通过线程工厂给每个创建出来的线程设置更有意义的名字，Debug和定位问题时非常有帮助。
 5. RejectedExecutionHandler（饱和策略）
-当队列和线程池都满了，说明线程池处于饱和状态，那么必须采取一种策略处理提交的新任务。这个策略默认情况下是AbortPolicy，表示无法处理新任务时抛出异常。以下是JDK1.5提供的四种策略。n AbortPolicy：直接抛出异常。
+当队列和线程池都满了，说明线程池处于饱和状态，那么必须采取一种策略处理提交的新任务。这个策略默认情况下是AbortPolicy，表示无法处理新任务时抛出异常。以下是JDK1.5提供的四种策略。
+    AbortPolicy：直接抛出异常。
     CallerRunsPolicy：只用调用者所在线程来运行任务。
     DiscardOldestPolicy：丢弃队列里最近的一个任务，并执行当前任务。
     DiscardPolicy：不处理，丢弃掉。
@@ -45,15 +141,18 @@ Executors-默认线程池参数
 ## 3. 1 J.U.C
 ![参考文档](./pri/知识点20181126.docx)
 ### AQS--AbstractQueuedSynchronizer
+http://www.cnblogs.com/waterystone/p/4920797.html
 
+
+CLH和MCS mcs:https://www.cnblogs.com/doit8791/p/9098188.html
 ### 并发集合---concurrent
-
+//todo
 ### 原子性--Atomic
-
+//todo
 
 CountDownLatch
 
-信号量-semphere
+信号量-Semaphore
 
 
 ## 3. 2 BlockingQueue--阻塞队列
