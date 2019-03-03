@@ -6,7 +6,7 @@
 解耦，异步，削峰（避免大数据量造成系统宕机）
 
 2. Zookeeper在kafka中作用
- 1.broker注册；2.topic注册；3.生产者负载均衡；4.消费者信息；5.消费者和分区关系；6.消费者负载均衡；7.消费者offset提交（high level api）
+ 1.broker注册；2.topic注册；3.生产者负载均衡；4.消费者信息；5.消费者和分区关系；6.消费者负载均衡；7.消费者offset提交（high level api，0.11版本转移到kafka的consumer_offset topic）
 3. 多分区的设计的特点： 
   * 1 为了并发读写，加快读写速度； 
   * 2 是利用多分区的存储，利于数据的均衡； 
