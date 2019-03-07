@@ -1,39 +1,120 @@
+- [概念](#%E6%A6%82%E5%BF%B5)
 - [原子操作](#%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C)
+  - [CAS](#cas)
 - [多线程](#%E5%A4%9A%E7%BA%BF%E7%A8%8B)
-- [3.并发包](#3%E5%B9%B6%E5%8F%91%E5%8C%85)
-  - [3. 1 J.U.C](#3-1-juc)
-    - [AQS--AbstractQueuedSynchronizer](#aqs--abstractqueuedsynchronizer)
-    - [并发集合---concurrent](#%E5%B9%B6%E5%8F%91%E9%9B%86%E5%90%88---concurrent)
-    - [原子性--Atomic](#%E5%8E%9F%E5%AD%90%E6%80%A7--atomic)
-  - [3. 2 BlockingQueue--阻塞队列](#3-2-blockingqueue--%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97)
-- [4.synchronized关键字](#4synchronized%E5%85%B3%E9%94%AE%E5%AD%97)
-- [5.volatile关键字](#5volatile%E5%85%B3%E9%94%AE%E5%AD%97)
   - [多线程开发良好的实践](#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91%E8%89%AF%E5%A5%BD%E7%9A%84%E5%AE%9E%E8%B7%B5)
+- [并发包(J.U.C)](#%E5%B9%B6%E5%8F%91%E5%8C%85juc)
+  - [AQS--AbstractQueuedSynchronizer](#aqs--abstractqueuedsynchronizer)
+    - [框架](#%E6%A1%86%E6%9E%B6)
+    - [源码详解](#%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3)
+  - [JUC下的同步器](#juc%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%99%A8)
+  - [并发集合---concurrent](#%E5%B9%B6%E5%8F%91%E9%9B%86%E5%90%88---concurrent)
+  - [原子类--Atomic](#%E5%8E%9F%E5%AD%90%E7%B1%BB--atomic)
+  - [BlockingQueue--阻塞队列](#blockingqueue--%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97)
 
+# 概念
+  - 串行
+  就是按照顺序一个个执行任务。
+
+  - 并行
+  指两个或两个以上事件或任务在同一时刻发生。（每个CPU运行一个任务）
+
+  - 并发
+   是在同一个cpu(线路)上同时（不是真正的同时，而是看来是同时，因为cpu要在多个程序间切换）运行多个任务。(一个CPU(线路)运行多个任务)
 
 # 原子操作
-吧
+  原子操作是指一个不受其他操作影响的操作任务单元。原子操作是在多线程环境下避免数据不一致必须的手段。
+
+## CAS
+  CAS（Compare and swap）比较和替换是设计并发算法时用到的一种技术。
+
+- 底层实现:
+    使用Unsafe类，都是native方法，unsafe底层实现是汇编的cmpxchg 实现，处理器执行cmpxchg是原子性操作（如果是多处理器，也需要对cmpxchg操作使用lock指令加锁）。
+    
+    CAS基于硬件实现，不需要进入内核，不需要切换线程，操作自旋几率较少，因此可以获得更高的性能。
+
+- ABA问题-AtomicStampedReference
+- 
+  AtomicStampedReference原子类是一个带有时间戳的对象引用，在每次修改后，AtomicStampedReference不仅会设置新值而且还会记录更改的时间。
+  当AtomicStampedReference设置对象值时，对象值以及时间戳都必须满足期望值才能写入成功，这也就解决了反复读写时，无法预知值是否已被修改的窘境。
+
 # 多线程
-# 3.并发包
-## 3. 1 J.U.C
+
+[线程池参考"线程模块"](./线程.md)
+//todo 待完善
+
+## 多线程开发良好的实践
+ 1. 给线程起个有意义的名字，这样可以方便找 Bug。
+ 2. 缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
+ 3. 多用同步工具少用 wait() 和 notify()。
+   首先，CountDownLatch, CyclicBarrier, Semaphore 和 Exchanger 这些同步类简化了编码操作，而用 wait() 和 notify() 很难实现复杂控制流；
+   其次，这些同步类是由最好的企业编写和维护，在后续的 JDK 中还会不断优化和完善。
+ 4. 使用 BlockingQueue 实现生产者消费者问题。
+ 5. 多用并发集合少用同步集合，例如应该使用 ConcurrentHashMap 而不是 Hashtable。
+ 6. 使用本地变量和不可变类来保证线程安全。
+ 7. 使用线程池而不是直接创建线程，这是因为创建线程代价很高，线程池可以有效地利用有限的线程来启动任务。
+
+# 并发包(J.U.C)
 ![参考文档](./pri/知识点20181126.docx)
-### AQS--AbstractQueuedSynchronizer
-http://www.cnblogs.com/waterystone/p/4920797.html
+## AQS--AbstractQueuedSynchronizer
+### 框架
+![CLH队列(FIFO)](./pic/CLH队列(FIFO).png)
+  它维护了一个**volatile int state（代表共享资源）**和一个FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）。这里volatile是核心关键词，具有volatile的语义，在此不述。state的访问方式有三种:
+    
+    getState()
+    setState()
+    compareAndSetState()
+
+  >> state状态的值：
+
+    CANCELLED，值为1，表示当前的线程被取消；
+    SIGNAL，值为-1，表示当前节点的后继节点包含的线程需要运行，也就是unpark；
+    CONDITION，值为-2，表示当前节点在等待condition，也就是在condition队列中；
+    PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行；
+    值为0，表示当前节点在sync队列中，等待着获取锁。
+
+ - AQS定义两种资源共享方式：Exclusive（独占，只有一个线程能执行，如ReentrantLock）和Share（共享，多个线程可同时执行，如Semaphore/CountDownLatch）。
+
+- 不同的自定义同步器争用共享资源的方式也不同。自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可，至于具体线程等待队列的维护（如获取资源失败入队/唤醒出队等），AQS已经在顶层实现好了。自定义同步器实现时主要实现以下几种方法：
+
+    isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
+
+    tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。(这个方法的实现需要查询当前状态是否允许获取，然后再进行获取（使用compareAndSetState来做）状态。)
+
+    tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
+
+    tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+
+    tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
+
+  -  以ReentrantLock为例，state初始化为0，表示未锁定状态。A线程lock()时，会调用tryAcquire()独占该锁并将state+1。此后，其他线程再tryAcquire()时就会失败，直到A线程unlock()到state=0（即释放锁）为止，其它线程才有机会获取该锁。当然，释放锁之前，A线程自己是可以重复获取此锁的（state会累加），这**就是可重入的概念**。但要注意，获取多少次就要释放多么次，这样才能保证state是能回到零态的。
+
+  - 再以CountDownLatch以例，任务分为N个子线程去执行，state也初始化为N（注意N要与线程个数一致）。这N个子线程是并行执行的，每个子线程执行完后countDown()一次，state会CAS减1。等到所有子线程都执行完后(即state=0)，会unpark()主调用线程，然后主调用线程就会从await()函数返回，继续后余动作。
+
+　　一般来说，自定义同步器要么是独占方法，要么是共享方式，他们也只需实现tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared中的一种即可。但AQS也支持自定义同步器同时实现独占和共享两种方式，如ReentrantReadWriteLock。
+
+[CLH和MCS](https://www.cnblogs.com/doit8791/p/9098188.html)
+
+### 源码详解
+[源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
+
+## JUC下的同步器
+  1. ReentrantLock-独享模式
+  2. ReentrantReadWriteLock-独享、共享模式交叉
+  3. CountDownLatch-共享模式
+  4. Semaphore(信号量)-共享模式
 
 
-CLH和MCS mcs:https://www.cnblogs.com/doit8791/p/9098188.html
-### 并发集合---concurrent
+## 并发集合---concurrent
 //todo
-### 原子性--Atomic
+## 原子类--Atomic
 //todo
-
-CountDownLatch
-
-信号量-Semaphore
+AtomicInteger：volatile value计算，cas更新数据，效率低于LongAdder
+LongAdder: cells[]分段计算，依赖cas,最后sum汇总，效率最高
 
 
-## 3. 2 BlockingQueue--阻塞队列
-
+## BlockingQueue--阻塞队列
+  它主要用于实现生产者-消费者问题。
 java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 * FIFO 队列 ：LinkedBlockingQueue、ArrayBlockingQueue（固定长度）
 
@@ -46,13 +127,5 @@ java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 **PriorityBlockingQueue**: 优先级队列 
 
 
-http://www.cnblogs.com/hapjin/p/5492880.html
 
-## 多线程开发良好的实践
-给线程起个有意义的名字，这样可以方便找 Bug。
-缩小同步范围，从而减少锁争用。例如对于 synchronized，应该尽量使用同步块而不是同步方法。
-多用同步工具少用 wait() 和 notify()。首先，CountDownLatch, CyclicBarrier, Semaphore 和 Exchanger 这些同步类简化了编码操作，而用 wait() 和 notify() 很难实现复杂控制流；其次，这些同步类是由最好的企业编写和维护，在后续的 JDK 中还会不断优化和完善。
-使用 BlockingQueue 实现生产者消费者问题。
-多用并发集合少用同步集合，例如应该使用 ConcurrentHashMap 而不是 Hashtable。
-使用本地变量和不可变类来保证线程安全。
-使用线程池而不是直接创建线程，这是因为创建线程代价很高，线程池可以有效地利用有限的线程来启动任务。
+
