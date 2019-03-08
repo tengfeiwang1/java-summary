@@ -34,7 +34,7 @@
     CAS基于硬件实现，不需要进入内核，不需要切换线程，操作自旋几率较少，因此可以获得更高的性能。
 
 - ABA问题-AtomicStampedReference
-- 
+
   AtomicStampedReference原子类是一个带有时间戳的对象引用，在每次修改后，AtomicStampedReference不仅会设置新值而且还会记录更改的时间。
   当AtomicStampedReference设置对象值时，对象值以及时间戳都必须满足期望值才能写入成功，这也就解决了反复读写时，无法预知值是否已被修改的窘境。
 
@@ -106,11 +106,48 @@
 
 
 ## 并发集合---concurrent
+http://ifeve.com/concurrent-collections-1/
+
+    阻塞集合：这种集合包括添加和删除数据的操作。如果操作不能立即进行，是因为集合已满或者为空，该程序将被阻塞，直到操作可以进行。
+    非阻塞集合：这种集合也包括添加和删除数据的操作。如果操作不能立即进行，这个操作将返回null值或抛出异常，但该线程将不会阻塞。
+
+  - 非阻塞队列：
+  
+    ConcurrentHashMap:多个并发线程同时使用同一个HashMap对象时，会出现“程序假死”状态，**因为HashMap是线程不安全的，不能被多个线程所操作**，而**HashTable虽然是线程安全的**，但是在**多线程iterator()循环中调用remove()时会报异常**，解决办法就是使用ConcurrentHashMap 代替。
+    ConcurrentSkipListMap:ConcurrentHashMap不支持排序，**而ConcurrentSkipListMap是ConcurrentHashMap的可排序版本**。
+    ConcurrentSkipListSet:支持排序且不允许重复的元素
+    ConcurrentLinkedQueue:提供**并发环境的队列操作**，常用方法：poll()、element()、peek()、add()
+    ConcurrentLinkedDeque:**ConcurrentLinkedQueue 仅支持表头操作，ConcurrentLinkedDeque 支持队列头和队列尾双向操作**
+    CopyOnWriteArrayList:ArrayList是非线程安全类，如果想在并发中实现安全，需要使用CopyOnWriteArrayList，**CopyOnWriteArrayList 可以在循环中删除元素**
+    CopyOnWriteArraySet:HashSet的线程安全实现
+
+  - 阻塞队列：
+　　ArrayBlockingQueue    有界阻塞队列
+　　PriorityBlockingQueue    并发情况下的有限队列
+　　LinkedBlockingQueue    与 ArrayBlockingQueue 功能一致，但是 LinkedBlockingQueue 是无界的
+　　LinkedBlockingDueue    LinkedBlockingQueue 的双向队列版本
+　　SynchronousQueue    异步队列，每个插入操作必须等待另一个线程的对应移除操作，反之亦然。
+　　DelayQueue    延时执行任务的队列
+　　LinkedTransferQueue    提供与 SynchronousQueue 类似的功能，但具有嗅探功能，可以尝试性地添加一些数据
+
+
+- ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
+- 
+    非阻塞列表，使用ConcurrentLinkedDeque类。
+    阻塞列表，使用LinkedBlockingDeque类。
+    用在生产者与消费者数据的阻塞列表，使用LinkedTransferQueue类。
+    使用优先级排序元素的阻塞列表，使用PriorityBlockingQueue类。
+    存储延迟元素的阻塞列表，使用DelayQueue类。
+    非阻塞可导航的map，使用ConcurrentSkipListMap类。
+    随机数，使用ThreadLocalRandom类
+    原子变量，使用AtomicLong和AtomicIntegerArray类
+
 //todo
 ## 原子类--Atomic
+http://ifeve.com/concurrent-collections-8/
 //todo
 AtomicInteger：volatile value计算，cas更新数据，效率低于LongAdder
-LongAdder: cells[]分段计算，依赖cas,最后sum汇总，效率最高
+LongAdder: cells[]分段计算，依赖cas,最后sum汇总，高并发时效率最高
 
 
 ## BlockingQueue--阻塞队列
