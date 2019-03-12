@@ -41,7 +41,7 @@
 # 多线程
 
 [线程池参考"线程模块"](./线程.md)
-//todo 待完善
+
 
 ## 多线程开发良好的实践
  1. 给线程起个有意义的名字，这样可以方便找 Bug。
@@ -129,11 +129,9 @@ http://ifeve.com/concurrent-collections-1/
 　　SynchronousQueue    异步队列，每个插入操作必须等待另一个线程的对应移除操作，反之亦然。
 　　DelayQueue    延时执行任务的队列
 　　LinkedTransferQueue    提供与 SynchronousQueue 类似的功能，但具有嗅探功能，可以尝试性地添加一些数据
-
-
-- ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
-- 
-    非阻塞列表，使用ConcurrentLinkedDeque类。
+   
+   
+  >> tips:非阻塞列表，使用ConcurrentLinkedDeque类。
     阻塞列表，使用LinkedBlockingDeque类。
     用在生产者与消费者数据的阻塞列表，使用LinkedTransferQueue类。
     使用优先级排序元素的阻塞列表，使用PriorityBlockingQueue类。
@@ -142,13 +140,19 @@ http://ifeve.com/concurrent-collections-1/
     随机数，使用ThreadLocalRandom类
     原子变量，使用AtomicLong和AtomicIntegerArray类
 
-//todo
+- ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
+
+
 ## 原子类--Atomic
 http://ifeve.com/concurrent-collections-8/
-//todo
-AtomicInteger：volatile value计算，cas更新数据，效率低于LongAdder
-LongAdder: cells[]分段计算，依赖cas,最后sum汇总，高并发时效率最高
 
+  - AtomicInteger：volatile value计算，cas更新数据，效率低于LongAdder
+  
+    在同一个代码块中使用两个或以上atomic变量，会导致原子性丢失
+  - LongAdder(JDK 1.8): cells[]分段计算，依赖cas,最后sum汇总，高并发时效率最高
+    add方法会动态扩展：根据并发数量/线程数量进行扩展，并且动态扩容
+https://www.cnblogs.com/rickzhai/p/7936758.html
+[LongAdder源码](https://blog.csdn.net/zqz_zqz/article/details/70665941)
 
 ## BlockingQueue--阻塞队列
   它主要用于实现生产者-消费者问题。
