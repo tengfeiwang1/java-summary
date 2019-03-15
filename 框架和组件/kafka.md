@@ -45,3 +45,14 @@ On restart restore the position of the consumer using seek(TopicPartition, long)
 # KAFKA STREAM
 //todo
 https://blog.csdn.net/CRISPY_RICE/article/details/79354144
+
+
+#kafka使用记录
+//todo
+producer
+
+consumer
+
+多partition消费
+
+手动提交事务

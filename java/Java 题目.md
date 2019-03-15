@@ -1,13 +1,18 @@
 ## 面试题目
 
-1.
+1. redis缓存穿透
+2. 一致性hash实现：md5+虚拟节点+treemap  tailmap（顺时针方向下个节点）
+3. treemap原理
 
-1. es 一个shard和十个shard的使用磁盘大小是否一样
-2. 动态规划-二叉树最大
-3. static synchronizer 锁类
-4. 设计模式
-5. 分布式一致性算法原理 ：zookeeper实现数据一致性的核心是ZAB协议（Zookeeper原子消息广播协议）
-6. zk选举leader算法：FastLeaderElection(默认)，FastLeaderElection选举算法是标准的Fast Paxos算法实现，可解决LeaderElection选举算法收敛速度慢的问题。
+
+
+
+4. es 一个shard和十个shard的使用磁盘大小是否一样
+5. 动态规划-二叉树最大
+6. static synchronizer 锁类
+7. 设计模式
+8. 分布式一致性算法原理 ：zookeeper实现数据一致性的核心是ZAB协议（Zookeeper原子消息广播协议）
+9.  zk选举leader算法：FastLeaderElection(默认)，FastLeaderElection选举算法是标准的Fast Paxos算法实现，可解决LeaderElection选举算法收敛速度慢的问题。
 
 
 
