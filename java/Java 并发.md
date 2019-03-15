@@ -77,15 +77,15 @@
 
 - 不同的自定义同步器争用共享资源的方式也不同。自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可，至于具体线程等待队列的维护（如获取资源失败入队/唤醒出队等），AQS已经在顶层实现好了。自定义同步器实现时主要实现以下几种方法：
 
-    isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
+    - isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
 
-    tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。(这个方法的实现需要查询当前状态是否允许获取，然后再进行获取（使用compareAndSetState来做）状态。)
+    - tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。(这个方法的实现需要查询当前状态是否允许获取，然后再进行获取（使用compareAndSetState来做）状态。)
 
-    tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
+    - tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
 
-    tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+    - tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
 
-    tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
+    - tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
 
   -  以ReentrantLock为例，state初始化为0，表示未锁定状态。A线程lock()时，会调用tryAcquire()独占该锁并将state+1。此后，其他线程再tryAcquire()时就会失败，直到A线程unlock()到state=0（即释放锁）为止，其它线程才有机会获取该锁。当然，释放锁之前，A线程自己是可以重复获取此锁的（state会累加），这**就是可重入的概念**。但要注意，获取多少次就要释放多么次，这样才能保证state是能回到零态的。
 

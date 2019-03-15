@@ -16,6 +16,7 @@ G1并发
 
 
 # 类加载机制
+[详细参考java基础](./Java基础.md)
 ![类的生命周期](./pic/loadclass.png)
 1. 装载(Load)：查找和加载Class(二进制)文件；
 2. 链接(Link)：把类的二进制数据合并到JRE中；
