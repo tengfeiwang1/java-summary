@@ -1,13 +1,32 @@
 
-jstat
-
 # JVM内存结构
-## JVM运行态数据分区
-//todo  
-## 内存模型JMM
-//todo
+## JVM运行态数据分区(内存结构)
+![JVM内存结构](./pic/JVM内存结构.png)
+![JVM内存结构对比](./pic/JVM内存结构对比.png)
+[详解](https://www.cnblogs.com/dingyingsi/p/3760447.html)
+
+## Java内存模型(JMM:Java Memory Model)
+
+>> JMM并不像JVM内存结构一样是真实存在的。他只是一个抽象的概念。JSR-133: Java Memory Model and Thread Specification中描述了，**JMM是和多线程相关的**，他描述了一组规则或规范，这个规范定义了一个线程对共享变量的写入时对另一个线程是可见的。
+
+![Java内存模型](./pic/JMM.png)
+- Java的多线程之间是通过共享内存进行通信的，而由于采用共享内存进行通信，在通信过程中会存在一系列如可见性、原子性、顺序性等问题，而JMM就是围绕着多线程通信以及与其相关的一系列特性而建立的模型。JMM定义了一些语法集，这些语法集映射到Java语言中就是volatile、synchronized等关键字。
+
+## Java对象模型
+>> Java是一种面向对象的语言，而Java对象在JVM中的存储也是有一定的结构的。而这个关于**Java对象自身的存储模型称之为Java对象模型**。
+HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Pointer）指的是普通对象指针，而Klass用来描述对象实例的具体类型。
+每一个Java类，在被JVM加载的时候，JVM会给这个类创建一个instanceKlass，保存在方法区，用来在JVM层表示该Java类。当我们在Java代码中，使用new创建一个对象的时候，JVM会创建一个instanceOopDesc对象，这个对象中包含了对象头以及实例数据,存储在堆区。
+![Java对象模型](./pic/OOP-Klass模型.jpg)
 
 # GC垃圾回收算法
+[参考](http://www.cnblogs.com/ityouknow/p/5614961.html)
+>> 垃圾收集 Garbage Collection 通常被称为"GC".
+   JVM 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于**Java堆和方法区**中，在程序运行期间，这部分内存的分配和使用都是动态的
+
+## 对象存活判断
+判断对象是否存活一般有两种方式：
+- **引用计数**：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，无法解决对象相互循环引用的问题。
+- **可达性分析(Reachability Analysis)**：从GC Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。
 
 串行
 并行
