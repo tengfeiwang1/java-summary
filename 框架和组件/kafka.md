@@ -15,6 +15,15 @@
 ## Kafka快速写：
 1. 以顺序追加的方式向各个分区中写入消息-消息顺序写入磁盘。
 2. 同时，KAFKA采用了MMAP(Memory Mapped Files，内存映射文件)技术-利用操作系统的页缓存来实现文件到物理内存的直接映射。完成映射之后对物理内存的操作在适当时候会被同步到硬盘上。
+
+- 生产者的关键配置
+batch.size： 基于大小的batching策略
+linger.ms： 基于时间的batching策略
+compression.type：压缩的速度上lz4=snappy < gzip
+max.in.flight.requests.per.connection (affects ordering，设置为1可以保证有序性，但是发送性能会受影响。不为1的时候，如果发生消息重发则会乱序)
+acks (affects durability)
+PS： 更大的批次，意味着更好的压缩率、更高的吞吐量。但是负面影响，就是延迟会高些。
+
 ## Kafka快速读：
 1. 零拷贝-在Linux中，是通过sendfile系统调用来完成的。Java提供了访问这个系统调用的方法：FileChannel.transferTo API。
 Kafka使用sendfile，只需要一次拷贝就行：允许操作系统将数据直接从页缓存发送到网络上。所以在这个优化的路径中，只有最后一步将数据拷贝到网卡缓存中是需要的。这种页缓存和sendfile组合，意味着KAFKA集群的消费者大多数都完全从缓存消费消息，而磁盘没有任何读取活动

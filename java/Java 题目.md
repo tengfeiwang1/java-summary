@@ -1,22 +1,23 @@
 ## 面试题目
 
-1. redis缓存穿透
+1. redis缓存穿透--缓存和数据库都没有数据（方法1.增加监控拦截，2。如果读到key的value为null时，在缓存插入key-null值，3.布隆过滤）
 2. 一致性hash实现：md5+虚拟节点+treemap  tailmap（顺时针方向下个节点）
-3. treemap原理
+3. treemap原理-红黑树
 
 
 
 
 4. es 一个shard和十个shard的使用磁盘大小是否一样
 5. 动态规划-二叉树最大
-6. static synchronizer 锁类
-7. 设计模式
+6. static synchronizer 锁类： synchronizer锁对象，但是和static配合就时针对这个类加锁
+7. 设计模式-
 8. 分布式一致性算法原理 ：zookeeper实现数据一致性的核心是ZAB协议（Zookeeper原子消息广播协议）
-9.  zk选举leader算法：FastLeaderElection(默认)，FastLeaderElection选举算法是标准的Fast Paxos算法实现，可解决LeaderElection选举算法收敛速度慢的问题。
+9.  zk选举leader算法：**FastLeaderElection**(默认)，FastLeaderElection选举算法是标准的Fast Paxos算法实现，可解决LeaderElection选举算法收敛速度慢的问题。
 
 
 
-CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性），三者不可兼得。 
+CAP原则又称CAP定理，
+指的是在一个分布式系统中，**Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）**，三者不可兼得。 
 
 记录1
 如何排查服务可用性问题：
@@ -49,6 +50,7 @@ https://www.cnblogs.com/bonelee/p/7458221.html
 4. es索引优化-
 5. es服务宕机处理 --一个节点宕机，磁盘占满情况下，需要迁移节点数据目录到大容量的机器上，并需要reroute
 https://blog.csdn.net/u012386386/article/details/78811618
+
 6. es缓存分配三种缓存机制---
 es配置jvm占用内存最大32G,lucene heap占用系统内存（不超过系统可用内存的一半）
 filter cache(query cache)  10% heap内存

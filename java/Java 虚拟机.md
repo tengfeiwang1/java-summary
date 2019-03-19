@@ -97,7 +97,7 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 参数控制：-XX:+UseParallelGC  使用Parallel收集器+ 老年代串行
 
 **JDK8默认收集器查看**
-java -XX:+PrintCommandLineFlags -version
+命令：java -XX:+PrintCommandLineFlags -version
 默认-XX：UseParallelGC -----  新生代（Parallel Scavenge），老年代（Ps MarkSweep）
 [垃圾收集常用参数](./pic/垃圾收集常用参数.png)
 
@@ -131,7 +131,7 @@ java -XX:+PrintCommandLineFlags -version
 >> 使用G1收集器时，Java堆的内存布局与其他收集器有很大差别，它将整个Java堆划分为多个大小相等的独立区域（Region），虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔阂了，它们都是一部分（可以不连续）Region的集合。
 
 - 收集步骤
-1. **标记阶段**，首先初始标记(Initial-Mark),这个阶段是**停顿的(Stop the World Event)**，并且会触发一次普通Mintor GC。对应GC log:GC pause (young) (inital-mark)
+1. **标记阶段**，首先初始标记(Initial-Mark),这个阶段是**停顿的(Stop the World Event)**，并且会触发一次普通Minor GC。对应GC log:GC pause (young) (inital-mark)
 2. **Root Region Scanning**，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。
 3. **Concurrent Marking**，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。
 [并发标记](./pic/并发标记.png)
@@ -143,9 +143,9 @@ java -XX:+PrintCommandLineFlags -version
 - Minor GC触发条件：当Eden区满时，触发MinorGC。
 - Full GC触发条件：
 1. 调用System.gc时，系统建议执行Full GC，但是不必然执行
-2. 老生代空间不足
-3. 方法去空间不足
-4. 通过Minor GC后进入老年代的平均大小大于老年代的可用内存
+2. 老年代空间不足
+3. 方法区空间不足
+4. 通过Minor GC后进入老年代的平均大小**大于老年代的可用内存**
 5. 由Eden区、From Space区向To Space区复制时，对象大小大于To Space可用内存，则把该对象转存到老年代，*且老年代的可用内存小于该对象大小*.
 
 
