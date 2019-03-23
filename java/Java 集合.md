@@ -25,7 +25,7 @@ tips:accessOrder:决定了顺序，默认为 false，此时维护的是插入顺
 accessOrder 为 true时:当一个节点被访问时，则会将该节点移到链表尾部。(也就是说指定为 LRU 顺序之后，在每次访问一个节点时，会将这个节点移到链表尾部，保证链表尾部是最近访问的节点，那么链表首部就是最近最久未使用的节点。)
 
 
- ## Treemap
+## Treemap
 [详解](https://www.cnblogs.com/chenssy/p/3746600.html)
 **TreeMap的实现是红黑树算法的实现;**
 
@@ -47,6 +47,12 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 
 ### descendingMap()
 反向TreeMap
+
+## HashMap实现原理
+[参考](https://blog.csdn.net/hefenglian/article/details/79763634)
+在JDK1.6，JDK1.7中，HashMap采用**位桶+链表**实现，即使用链表处理冲突,同一hash值的键值对会被放在同一个位桶里，当桶中元素较多时，通过key值查找的效率较低。
+
+而JDK1.8中，HashMap采用**位桶+链表+红黑树**实现，当链表长度超过阈值（8）,时，将链表转换为红黑树，这样大大减少了查找时间。
 
 ## ConcurrentHashMap
 - ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/

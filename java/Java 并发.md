@@ -11,6 +11,8 @@
   - [并发集合---concurrent](#%E5%B9%B6%E5%8F%91%E9%9B%86%E5%90%88---concurrent)
   - [原子类--Atomic](#%E5%8E%9F%E5%AD%90%E7%B1%BB--atomic)
   - [BlockingQueue--阻塞队列](#blockingqueue--%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97)
+  - [ThreadLocal](#threadlocal)
+    - [原理](#%E5%8E%9F%E7%90%86)
 
 # 概念
   - 串行
@@ -167,6 +169,10 @@ java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 
 **PriorityBlockingQueue**: 优先级队列 
 
+## ThreadLocal
+每一个ThreadLocal能够放一个线程级别的变量，可是它本身能够被多个线程共享使用，并且又能够达到线程安全的目的，且绝对线程安全。
+### 原理
+[ThreadLocal](./pic/ThreadLocal.png)
 
-
-
+ThreadLocalMap对象在Thread里面作为私有的变量而存在，所以是线程安全的。
+ThreadLocal通过Thread.currentThread()获取当前的线程就能得到这个Map对象。同一时候将自身作为Key发起写入和读取，因为将自身作为Key，所以一个ThreadLocal对象就能存放一个线程中相应的Java对象。通过get也自然能找到这个对象。
