@@ -3,7 +3,7 @@
 1.  Set 
 * TreeSet：基于红黑树实现，支持有序性操作，例如根据一个范围查找元素的操作。但是查找效率不如 HashSet，HashSet 查找的时间复杂度为 O(1)，TreeSet 则为 O(logN)。
 * HashSet：基于哈希表实现，支持快速查找，但不支持有序性操作。并且失去了元素的插入顺序信息，也就是说使用 Iterator 遍历 HashSet 得到的结果是不确定的。
-* LinkedHashSet：具有 HashSet 的查找效率，且内部使用双向链表维护元素的插入顺序。
+* LinkedHashSet：具有 HashSet 的查找效率(底层调用的LinkedHashMap)，且内部使用双向链表维护元素的插入顺序。
 
 2.  List
 * ArrayList：基于动态数组实现，支持随机访问。
@@ -18,10 +18,10 @@
 ## 2) Map
 * TreeMap：基于红黑树实现。
 * HashMap：基于哈希表实现。
-* HashTable：和 HashMap 类似，但它是线程安全的，这意味着同一时刻多个线程可以同时写入 HashTable 并且不会导致数据不一致。它是遗留类，不应该去使用它。现在可以使用**ConcurrentHashMap** 来支持线程安全，并且 ConcurrentHashMap 的效率会更高，因为 ConcurrentHashMap 引入了分段锁。
-* LinkedHashMap：使用双向链表来维护元素的顺序，顺序为插入顺序或者最近最少使用（LRU）顺序。
+* HashTable：和 HashMap 类似，但它是线程安全的，这意味着同一时刻多个线程可以同时写入 HashTable 并且不会导致数据不一致。它是遗留类，不应该去使用它。现在可以使用**ConcurrentHashMap** 来支持线程安全，并且 ConcurrentHashMap 的效率会更高，因为 ConcurrentHashMap 引入了分段锁(jdk 1.7)。
+* LinkedHashMap：使用**双向链表**来维护元素的顺序，顺序为插入顺序或者最近最少使用（**LRU**）顺序。
 
-tips:accessOrder:决定了顺序，默认为 false，此时维护的是插入顺序。
+>> tips:accessOrder:决定了顺序，默认为 false，此时维护的是插入顺序。
 accessOrder 为 true时:当一个节点被访问时，则会将该节点移到链表尾部。(也就是说指定为 LRU 顺序之后，在每次访问一个节点时，会将这个节点移到链表尾部，保证链表尾部是最近访问的节点，那么链表首部就是最近最久未使用的节点。)
 
 
@@ -29,10 +29,10 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 [详解](https://www.cnblogs.com/chenssy/p/3746600.html)
 **TreeMap的实现是红黑树算法的实现;**
 
-1. TreeMap实现继承于AbstractMap，并且实现了NavigableMap接口。
+1. TreeMap实现继承于AbstractMap，并且实现了NavigableMap(导航(范围查询)，有序)接口。
 2. TreeMap的本质是R-B Tree(红黑树)，它包含几个重要的成员变量： root, size, comparator。
    - root 是红黑数的根节点。它是Entry类型，Entry是红黑数的节点，它包含了红黑数的6个基本组成成分：key(键)、value(值)、left(左孩子)、right(右孩子)、parent(父节点)、color(颜色)。Entry节点根据key进行排序，Entry节点包含的内容为value。
-   - 红黑数排序时，根据Entry中的key进行排序；Entry中的key比较大小是根据比较器**comparator**来进行判断的。
+   - 红黑树排序时，根据Entry中的key进行排序；Entry中的key比较大小是根据比较器**comparator**来进行判断的。
    - size是红黑数中节点的个数。
 
 ### put()
@@ -50,7 +50,7 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 
 ## HashMap实现原理
 [参考](https://blog.csdn.net/hefenglian/article/details/79763634)
-在JDK1.6，JDK1.7中，HashMap采用**位桶+链表**实现，即使用链表处理冲突,同一hash值的键值对会被放在同一个位桶里，当桶中元素较多时，通过key值查找的效率较低。
+在JDK1.6，JDK1.7中，HashMap采用**位桶(数组)+链表**实现，即使用链表处理冲突,同一hash值的键值对会被放在同一个位桶里，当桶中元素较多时，通过key值查找的效率较低。
 
 而JDK1.8中，HashMap采用**位桶+链表+红黑树**实现，当链表长度超过阈值（8）,时，将链表转换为红黑树，这样大大减少了查找时间。
 
@@ -61,4 +61,37 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 * JDK 1.8 核心类为Node，使用了 CAS 操作来支持更高的并发度，在 CAS 操作失败时使用内置锁 synchronized。
 并且 JDK 1.8 的实现也在链表过长时会转换为**红黑树**。
 
-LinkedHashMap
+
+### ConcurrentHashMap -get,put
+   - put
+根据 key 计算出 hashcode 。
+判断是否需要进行初始化。
+f 即为当前 key 定位出的 Node，如果为空表示当前位置可以写入数据，利用 **CAS 尝试写入**，失败则自旋保证成功。
+如果当前位置的 hashcode == MOVED == -1,则需要进行扩容。
+如果都不满足，则利用 **synchronized 锁**写入数据。
+如果数量大于 TREEIFY_THRESHOLD 则要**转换为红黑树**。
+
+   - get
+根据计算出来的 hashcode 寻址，如果就在桶上那么直接返回值。
+如果是红黑树那就按照树的方式获取值。
+都不满足那就按照链表的方式遍历获取值。
+
+### HashMap -get,put
+   - GET
+1. 首先将 key hash 之后取得所定位的桶。
+2. 如果桶为空则直接返回 null 。
+3. 否则判断桶的第一个位置(有可能是链表、红黑树)的 key 是否为查询的 key，是就直接返回 value。
+4. 如果第一个不匹配，则判断它的下一个是红黑树还是链表。
+5. 红黑树就按照树的查找方式返回值。
+6. 不然就按照链表的方式遍历匹配返回值。
+
+   - PUT
+1. 判断当前桶是否为空，空的就需要初始化（resize 中会判断是否进行初始化）。
+2. 根据当前 key 的 hashcode 定位到具体的桶中并判断是否为空，为空表明没有 Hash 冲突就直接在当前位置创建一个新桶即可。
+3. 如果当前桶有值(**Hash 冲突**)，那么就要比较当前桶中的 key、key 的 hashcode 与写入的 key 是否相等，相等就赋值给 e,在4第 8 步的时候会统一进行赋值及返回。
+4. 如果当前桶为红黑树，那就要按照红黑树的方式写入数据。
+5. 如果是个链表，就需要将当前的 key、value 封装成一个新节点写入到当前桶的后面（形成链表）。
+6. 接着判断当前链表的大小是否大于预设的阈值，大于时就要转换为红黑树(并平衡)。
+7. 如果在遍历过程中找到 key 相同时直接退出遍历。
+8. 如果 e != null 就相当于存在相同的 key,那就需要将值覆盖。
+9. 最后判断是否需要进行扩容。
