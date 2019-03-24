@@ -1,5 +1,7 @@
 todo  补上基础知识
 https://github.com/Snailclimb/JavaGuide/blob/master/Java%E7%9B%B8%E5%85%B3/Java%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md
+
+[类的实例化过程](https://blog.csdn.net/justloveyou_/article/details/72466416)
 # 一 基本类型
 byte：Java中最小的数据类型，在内存中占8位(bit)，即1个字节，取值范围-128~127，默认值0
 short：短整型，在内存中占16位，即2个字节，取值范围-32768~32717，默认值0
