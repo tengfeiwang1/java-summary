@@ -60,3 +60,13 @@ https://www.jianshu.com/p/3bdac5b0fed8
 https://blog.csdn.net/abcCL6/article/details/77171270
 
 优化es https://horsemen.iteye.com/blog/2277050
+
+2019-03-25
+1.zk存在的问题-同步数据超时，cap在哪一方面有欠缺
+2.**分布式事务**-https://www.cnblogs.com/savorboard/p/distributed-system-transaction-consistency.html
+3.嵌套事务--事务着重看下。一个事务，对外发出一个消息，然后当前事务异常，如何处理回滚？
+4.redis  key的分配原理-hash还是取余？
+5.redis 各种情况-雪崩，击穿
+6.轻量级锁原理，步骤
+7.两段事务提交，三段事务提交
+8，aqs
