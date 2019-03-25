@@ -6,6 +6,9 @@
 3. 可以扩展到上百台服务器，处理PB级别的结构化或非结构化数据。
 ## 索引
 term index-> term dictionary -> posting list
+//todo
+in-memory-buffer   -->> translog --> segment -->commit point
+[索引过程](https://www.cnblogs.com/wenBlog/p/8489197.html)
 
 ![term结构图](../java/pic/termindex.png)
 1. Term Index
@@ -30,7 +33,7 @@ Elasticsearch分别为每个field都建立了一个倒排索引，Kate, John, 24
 Bitmap的缺点是存储空间随着文档个数线性增长，Roaring bitmaps需要打破这个魔咒就一定要用到某些指数特性：
 * Roaring bitmaps（针对Filter数据的缓存）
 将posting list按照65535为界限分块，比如第一块所包含的文档id范围在0~65535之间，第二块的id范围是65536~131071，以此类推。再用*<商，余数>*的组合表示每一组id，这样每组里的id范围都在0~65535内了，剩下的就好办了，既然每组id不会变得无限大，那么我们就可以通过最有效的方式对这里的id存储。
-![roaringmap](./java/pic/roaringmap.png)
+![roaringmap](../java/pic/roaringmap.png)
 "为什么是以65535为界限?"
 程序员的世界里除了1024外，65535也是一个经典值，因为它=2^16-1，正好是用2个字节能表示的最大数，一个short的存储单位，注意“If a block has more than 4096 values, encode as a bit set, and otherwise as a simple array using 2 bytes per value”，如果是大块，用节省点用bitset存，小块就豪爽点，2个字节我也不计较了，用一个short[]存着方便。
 那为什么用4096来区分大块还是小块呢？

@@ -6,11 +6,13 @@
 - [并发包(J.U.C)](#%E5%B9%B6%E5%8F%91%E5%8C%85juc)
   - [AQS--AbstractQueuedSynchronizer](#aqs--abstractqueuedsynchronizer)
     - [框架](#%E6%A1%86%E6%9E%B6)
-    - [源码详解](#%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3)
+    - [AQS源码详解](#aqs%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3)
   - [JUC下的同步器](#juc%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%99%A8)
   - [并发集合---concurrent](#%E5%B9%B6%E5%8F%91%E9%9B%86%E5%90%88---concurrent)
   - [原子类--Atomic](#%E5%8E%9F%E5%AD%90%E7%B1%BB--atomic)
   - [BlockingQueue--阻塞队列](#blockingqueue--%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97)
+  - [ThreadLocal](#threadlocal)
+    - [原理](#%E5%8E%9F%E7%90%86)
 
 # 概念
   - 串行
@@ -95,8 +97,8 @@
 
 [CLH和MCS](https://www.cnblogs.com/doit8791/p/9098188.html)
 
-### 源码详解
-[源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
+### AQS源码详解
+[AQS源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
 
 ## JUC下的同步器
   1. ReentrantLock-独享模式
@@ -141,6 +143,7 @@ http://ifeve.com/concurrent-collections-1/
     原子变量，使用AtomicLong和AtomicIntegerArray类
 
 - ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
+[参考Java集合](./Java 集合.md)
 
 
 ## 原子类--Atomic
@@ -167,6 +170,10 @@ java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 
 **PriorityBlockingQueue**: 优先级队列 
 
+## ThreadLocal
+每一个ThreadLocal能够放一个线程级别的变量，可是它本身能够被多个线程共享使用，并且又能够达到线程安全的目的，且绝对线程安全。
+### 原理
+[ThreadLocal](./pic/ThreadLocal.png)
 
-
-
+ThreadLocalMap对象在Thread里面作为私有的变量而存在，所以是线程安全的。
+ThreadLocal通过Thread.currentThread()获取当前的线程就能得到这个Map对象。同一时候将自身作为Key发起写入和读取，因为将自身作为Key，所以一个ThreadLocal对象就能存放一个线程中相应的Java对象。通过get也自然能找到这个对象。
