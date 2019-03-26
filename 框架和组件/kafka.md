@@ -1,6 +1,8 @@
 # KAFKA
+https://infoq.cn/article/kafka-analysis-part-2
 
 详解：http://www.cnblogs.com/likehua/p/3999538.html
+https://blog.csdn.net/ychenfeng/article/details/74980531
 事务：https://www.zybuluo.com/tinadu/note/949867
 1. 为什么使用消息队列？
 解耦，异步，削峰（避免大数据量造成系统宕机）
