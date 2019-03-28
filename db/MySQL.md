@@ -135,6 +135,7 @@ https://www.linuxidc.com/Linux/2018-01/150614.htm
 
 
 #优化
+https://www.cnblogs.com/liujiacai/p/7605612.html
 1. InnoDB_row_lock状态变量来分析系统上的行锁的争夺情况：show status like 'innodb_row_lock%';
 如果发现锁争用比较严重，如InnoDB_row_lock_waits和InnoDB_row_lock_time_avg的值比较高；
 2. MySQL 性能优化：组成、表的设计
