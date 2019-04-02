@@ -31,7 +31,7 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 
 1. TreeMap实现继承于AbstractMap，并且实现了NavigableMap(导航(范围查询)，有序)接口。
 2. TreeMap的本质是R-B Tree(红黑树)，它包含几个重要的成员变量： root, size, comparator。
-   - root 是红黑数的根节点。它是Entry类型，Entry是红黑数的节点，它包含了红黑数的6个基本组成成分：key(键)、value(值)、left(左孩子)、right(右孩子)、parent(父节点)、color(颜色)。Entry节点根据key进行排序，Entry节点包含的内容为value。
+   - root 是红黑树的根节点。它是Entry类型，Entry是红黑树的节点，它包含了红黑树的6个基本组成成分：key(键)、value(值)、left(左孩子)、right(右孩子)、parent(父节点)、color(颜色)。Entry节点根据key进行排序，Entry节点包含的内容为value。
    - 红黑树排序时，根据Entry中的key进行排序；Entry中的key比较大小是根据比较器**comparator**来进行判断的。
    - size是红黑数中节点的个数。
 
