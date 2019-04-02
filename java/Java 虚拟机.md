@@ -24,6 +24,7 @@
 # JVM内存结构
 ## JVM运行态数据分区(内存结构)
 ![JVM内存结构](./pic/JVM内存结构.png)
+d
 ![JVM内存结构对比](./pic/JVM内存结构对比.png)
 [详解](https://www.cnblogs.com/dingyingsi/p/3760447.html)
 
@@ -83,13 +84,13 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 
 >> 串行收集器是最古老，最稳定以及效率高的收集器，可能会产生较长的停顿，只使用一个线程去回收。新生代、老年代使用**串行回收**；**新生代复制算法**、**老年代标记-压缩**；*垃圾收集的过程中会Stop The World（服务暂停）*
 参数控制：-XX:+UseSerialGC  串行收集器
-[串行收集器](./pic/串行收集器.png)
+![串行收集器](./pic/串行收集器.png)
 
 ### ParNew收集器
 >> ParNew收集器其实就是Serial收集器的多线程版本。**新生代并行，老年代串行**；**新生代复制算法、老年代标记-压缩**
 参数控制：-XX:+UseParNewGC  ParNew收集器
 -XX:ParallelGCThreads 限制线程数量
-[ParNew收集器](./pic/ParNew收集器.png)
+![ParNew收集器](./pic/ParNew收集器.png)
 
 
 ### Parallel收集器-并行收集器
@@ -99,7 +100,7 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 **JDK8默认收集器查看**
 命令：java -XX:+PrintCommandLineFlags -version
 默认-XX：UseParallelGC -----  新生代（Parallel Scavenge），老年代（Ps MarkSweep）
-[垃圾收集常用参数](./pic/垃圾收集常用参数.png)
+![垃圾收集常用参数](./pic/垃圾收集常用参数.png)
 
 ### Parallel Old 收集器
 >> Parallel Old是Parallel Scavenge收集器的**老年代版本，使用多线程和“标记－整理”算法**。这个收集器是在JDK 1.6中才开始提供
@@ -108,9 +109,10 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 
 ### CMS收集器(Concurrent Mark Sweep):并发标记-整理算法--**老年代收集器**（新生代使用ParNew）
 >> CMS收集器是基于“标记-清除”算法实现的，它的运作过程相对于前面几种收集器来说要更复杂一些，整个过程分为4个步骤，包括： 
-        初始标记（CMS initial mark） ---  Stop The World
+
+        初始标记（CMS initial mark）--- Stop The World
         并发标记（CMS concurrent mark） 
-        重新标记（CMS remark）        ---  Stop The World
+        重新标记（CMS remark）---Stop The World
         并发清除（CMS concurrent sweep） 
 其中初始标记、重新标记这两个步骤仍然需要“Stop The World”。初始标记仅仅只是*标记一下GC Roots能直接关联到的对象*，速度很快，并发标记阶段就是进行GC Roots Tracing的过程，而重新标记阶段则是为了*修正并发标记期间*，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长一些，但远比并发标记的时间短。 
 
@@ -120,7 +122,7 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
              -XX:+ UseCMSCompactAtFullCollection Full GC后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
             -XX:+CMSFullGCsBeforeCompaction  设置进行几次Full GC后，进行一次碎片整理
             -XX:ParallelCMSThreads  设定CMS的线程数量（一般情况约等于可用CPU数量）
-[CMS收集器](./pic/CMS收集器.png)
+![CMS收集器](./pic/CMS收集器.png)
 
 
 ### G1收集器:(Garbage First Collector)
@@ -134,7 +136,7 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 1. **标记阶段**，首先初始标记(Initial-Mark),这个阶段是**停顿的(Stop the World Event)**，并且会触发一次普通Minor GC。对应GC log:GC pause (young) (inital-mark)
 2. **Root Region Scanning**，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。
 3. **Concurrent Marking**，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。
-[并发标记](./pic/并发标记.png)
+![并发标记](./pic/并发标记.png)
 4. **Remark**, 再标记，会有**短暂停顿(STW)**。再标记阶段是用来收集 并发标记阶段 产生新的垃圾(并发阶段和应用程序一同运行)；G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning (SATB)。
 5. **Copy/Clean up**，多线程清除失活对象，**会有STW**。G1将回收区域的存活对象拷贝到新区域，清除Remember Sets，并发清空回收区域并把它返回到空闲区域链表中。
 6. 复制/清除过程后。回收区域的活性对象已经被集中回收到深蓝色和深绿色区域。
