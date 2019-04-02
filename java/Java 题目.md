@@ -78,3 +78,13 @@ https://blog.csdn.net/abcCL6/article/details/77171270
 6.轻量级锁原理，无锁-》偏向锁-》轻量级锁-重量级-》自旋
 7.两段事务提交，三段事务提交
 8，aqs
+
+2019-04-2
+1. kafka事务，
+2. kafka从producer到consumer的步骤和流程
+3. kafka 的leader和follow的容错机制
+4. 多线程共享数据-单击和分布式如何处理
+5. zk 子节点挂掉的处理机制--容错机制
+6. es的优化和原理
+7. kafka的原理和优化
+8. mysql的索引优化
