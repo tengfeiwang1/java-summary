@@ -81,10 +81,10 @@ https://blog.csdn.net/abcCL6/article/details/77171270
 
 2019-04-2
 1. kafka事务，
-2. kafka从producer到consumer的步骤和流程
-3. kafka 的leader和follow的容错机制
-4. 多线程共享数据-单击和分布式如何处理
-5. zk 子节点挂掉的处理机制--容错机制
+2. kafka从producer到consumer的步骤和流程--https://blog.csdn.net/qq_35641192/article/details/80956244
+3. kafka 的leader和follow的容错机制--https://blog.csdn.net/ychenfeng/article/details/74980531
+4. 多线程共享数据-单击和分布式如何处理--socket，rpc，读写文件
+5. zk 子节点挂掉的处理机制--容错机制-paxos选举fastleaderelection
 6. es的优化和原理
 7. kafka的原理和优化
-8. mysql的索引优化
+8. mysql的索引优化-索引树结构，索引的优化和设置
