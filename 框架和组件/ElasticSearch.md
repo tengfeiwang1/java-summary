@@ -78,6 +78,10 @@ Elasticsearch的索引思路:
 上面看到的压缩算法，都是对Posting list里的大量ID进行压缩的，那如果ID是顺序的，或者是有公共前缀等具有一定规律性的ID，压缩比会比较高；
 另外一个因素: 可能是最影响查询性能的，应该是最后通过Posting list里的ID到磁盘中查找Document信息的那步，因为Elasticsearch是分Segment存储的，根据ID这个大范围的Term定位到Segment的效率直接影响了最后查询的性能，如果*ID是有规律*的，可以快速跳过不包含该ID的Segment，从而减少不必要的磁盘读次数，
 
+优化
+https://blog.csdn.net/qq_18145031/article/details/53289797
+常见问题解决
+http://www.wklken.me/posts/2015/05/23/elasticsearch-issues.html
 
 #使用记录
 //todo

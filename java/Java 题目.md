@@ -75,12 +75,12 @@ https://blog.csdn.net/abcCL6/article/details/77171270
 3.嵌套事务--事务着重看下。一个事务，对外发出一个消息，然后当前事务异常，如何处理回滚？-回调方法，本地记录回滚
 4.redis  key的分配原理-hash还是取余？ crc161
 5.redis 各种情况-雪崩，击穿
-6.轻量级锁原理，无锁-》偏向锁-》轻量级锁-重量级-》自旋
+6.轻量级锁原理，无锁-》偏向锁-》轻量级锁-》自旋--》重量级
 7.两段事务提交，三段事务提交
 8，aqs
 
 2019-04-2
-1. kafka事务，
+1. kafka事务，https://www.cnblogs.com/middleware/p/9477133.html
 2. kafka从producer到consumer的步骤和流程--https://blog.csdn.net/qq_35641192/article/details/80956244
 3. kafka 的leader和follow的容错机制--https://blog.csdn.net/ychenfeng/article/details/74980531
 4. 多线程共享数据-单击和分布式如何处理--socket，rpc，读写文件
