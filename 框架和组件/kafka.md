@@ -16,7 +16,7 @@ https://blog.csdn.net/ychenfeng/article/details/74980531
 
 ## Kafka快速写：
 1. 以顺序追加的方式向各个分区中写入消息-消息顺序写入磁盘。
-2. 同时，KAFKA采用了MMAP(Memory Mapped Files，内存映射文件)技术-利用操作系统的页缓存来实现文件到物理内存的直接映射。完成映射之后对物理内存的操作在适当时候会被同步到硬盘上。
+2. 同时，KAFKA采用了MMAP(Memory Mapped Files，内存映射文件)技术-利用操作系统的**页缓存**来实现文件到物理内存的直接映射。完成映射之后对物理内存的操作在适当时候会被同步到硬盘上。
 
 - 生产者的关键配置
 batch.size： 基于大小的batching策略
@@ -27,7 +27,7 @@ acks (affects durability)
 PS： 更大的批次，意味着更好的压缩率、更高的吞吐量。但是负面影响，就是延迟会高些。
 
 ## Kafka快速读：
-1. 零拷贝-在Linux中，是通过sendfile系统调用来完成的。Java提供了访问这个系统调用的方法：FileChannel.transferTo API。
+1. 零拷贝-在Linux中，是通过**sendfile系统**调用来完成的。Java提供了访问这个系统调用的方法：FileChannel.transferTo API。
 Kafka使用sendfile，只需要一次拷贝就行：允许操作系统将数据直接从页缓存发送到网络上。所以在这个优化的路径中，只有最后一步将数据拷贝到网卡缓存中是需要的。这种页缓存和sendfile组合，意味着KAFKA集群的消费者大多数都完全从缓存消费消息，而磁盘没有任何读取活动
 
 
@@ -36,7 +36,7 @@ Kafka使用sendfile，只需要一次拷贝就行：允许操作系统将数据�
 * 1：表示获得Leader replica已经接收了数据的确认信息。  这个选择时延较小同时确保了server确认接收成功。 
 * -1：Producer会获得所有同步replicas都收到数据的确认。  同时时延最大，然而，这种方式并没有完全消除丢失消息的风险，因为同步replicas的数量可能是1。如果你想确保某些replicas接收到数据，那么你应该在Topic-level设置中选项min.insync.replicas设置一下。
 
-仅设置 acks= -1 也不能保证数据不丢失,当ISR列表中只有Leader时,同样有可能造成数据丢失。要保证数据不丢除了设置acks=-1，还要保证ISR的大小大于等于2。
+仅设置 acks= -1 也不能保证数据不丢失,当ISR列表中只有Leader时,同样有可能造成数据丢失。**要保证数据不丢除了设置acks=-1，还要保证ISR的大小大于等于2**。
 ▪具体参数设置： 
 request.required.acks:设置为-1 等待所有ISR列表中的Replica接收到消息后采算写成功。 
 min.insync.replicas: 设置为>=2,保证ISR中至少两个Replica。 
