@@ -27,6 +27,7 @@
 d
 ![JVM内存结构对比](./pic/JVM内存结构对比.png)
 [详解](https://www.cnblogs.com/dingyingsi/p/3760447.html)
+[元空间详解](https://blog.csdn.net/zhushuai1221/article/details/52122880)
 
 ## Java内存模型(JMM:Java Memory Model)
 
@@ -48,7 +49,7 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 
 ## 对象存活判断
 判断对象是否存活一般有两种方式：
-- **引用计数**：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，*无法解决对象相互循环引用的问题*。
+- ~~**引用计数**：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，*无法解决对象相互循环引用的问题*。~~
 - **可达性分析(Reachability Analysis)**：从GC Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。
 >> 在Java语言中，**GC Roots**包括：
   虚拟机栈中引用的对象。
