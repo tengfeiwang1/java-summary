@@ -40,3 +40,6 @@ ZooKeeper 是高性能的(但不是高可用的:网络抖动，宕机等)。 在
    2. 虽然使用主从复制模式，同一时间只有一个Leader，但是Failover机制保证了集群不存在单点失败（SPOF）的问题
    3. ZAB协议保证了Failover过程中的数据一致性
    4. 服务器收到数据后先写本地文件再进行处理，保证了数据的持久性
+
+## api应用
+https://www.cnblogs.com/qingyunzong/p/8666288.html
