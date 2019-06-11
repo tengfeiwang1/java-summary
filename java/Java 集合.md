@@ -56,6 +56,7 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 
 ## ConcurrentHashMap
 - ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
+https://www.cnblogs.com/zhaojj/p/8942647.html
 
 * JDK 1.7 使用分段锁机制来实现并发更新操作，核心类为 Segment，它继承自重入锁 ReentrantLock，并发度与 Segment 数量相等。
 * JDK 1.8 核心类为Node，使用了 CAS 操作来支持更高的并发度，在 CAS 操作失败时使用内置锁 synchronized。
