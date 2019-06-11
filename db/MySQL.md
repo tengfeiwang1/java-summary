@@ -140,6 +140,7 @@ https://www.cnblogs.com/liujiacai/p/7605612.html
 如果发现锁争用比较严重，如InnoDB_row_lock_waits和InnoDB_row_lock_time_avg的值比较高；
 2. MySQL 性能优化：组成、表的设计
 - EXPLAIN:解析查询语句，定位耗时性能点；
+https://blog.csdn.net/why15732625998/article/details/80388236
 - 开启查询缓存。避免某些 SQL 函数直接在 SQL 语句中使用，从而导致 Mysql 缓存失效。
 - 避免画蛇添足。目的是什么就取什么，例如某个逻辑是只需要判断是否存在女性，若是查到了一条即可，勿要全部都查一遍，此时要善用 limit。
 - 建合适的索引。所以要建在合适的地方，合适的对象上。经常操作 / 比较 / 判断的字段应该建索引。
