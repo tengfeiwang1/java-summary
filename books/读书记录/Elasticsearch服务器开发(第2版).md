@@ -18,10 +18,20 @@
   - [3.2 理解查询过程](#32-%E7%90%86%E8%A7%A3%E6%9F%A5%E8%AF%A2%E8%BF%87%E7%A8%8B)
     - [3.2.3 搜索类型](#323-%E6%90%9C%E7%B4%A2%E7%B1%BB%E5%9E%8B)
   - [3.3 基本查询](#33-%E5%9F%BA%E6%9C%AC%E6%9F%A5%E8%AF%A2)
+    - [3.3.11 fuzzy_like_this查询](#3311-fuzzylikethis%E6%9F%A5%E8%AF%A2)
+    - [3.3.14 通配符查询](#3314-%E9%80%9A%E9%85%8D%E7%AC%A6%E6%9F%A5%E8%AF%A2)
   - [3.4 复合查询](#34-%E5%A4%8D%E5%90%88%E6%9F%A5%E8%AF%A2)
     - [3.4.1 布尔查询](#341-%E5%B8%83%E5%B0%94%E6%9F%A5%E8%AF%A2)
   - [3.5 查询结果的过滤](#35-%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C%E7%9A%84%E8%BF%87%E6%BB%A4)
     - [3.5.3 过滤器的缓存](#353-%E8%BF%87%E6%BB%A4%E5%99%A8%E7%9A%84%E7%BC%93%E5%AD%98)
+  - [3.8 数据排序](#38-%E6%95%B0%E6%8D%AE%E6%8E%92%E5%BA%8F)
+    - [3.8.1 默认排序](#381-%E9%BB%98%E8%AE%A4%E6%8E%92%E5%BA%8F)
+    - [3.8.2 选择用于排序的字段](#382-%E9%80%89%E6%8B%A9%E7%94%A8%E4%BA%8E%E6%8E%92%E5%BA%8F%E7%9A%84%E5%AD%97%E6%AE%B5)
+    - [3.8.3 指定缺少字段的行为](#383-%E6%8C%87%E5%AE%9A%E7%BC%BA%E5%B0%91%E5%AD%97%E6%AE%B5%E7%9A%84%E8%A1%8C%E4%B8%BA)
+    - [3.8.4 动态条件](#384-%E5%8A%A8%E6%80%81%E6%9D%A1%E4%BB%B6)
+  - [3.9 查询重写](#39-%E6%9F%A5%E8%AF%A2%E9%87%8D%E5%86%99)
+    - [3.9.1 查询重写的属性](#391-%E6%9F%A5%E8%AF%A2%E9%87%8D%E5%86%99%E7%9A%84%E5%B1%9E%E6%80%A7)
+- [第4章 扩展索引结构](#%E7%AC%AC4%E7%AB%A0-%E6%89%A9%E5%B1%95%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84)
 
 # 第1章 Elasticsearch集群入门
 ## 1.1 全文检索
@@ -201,8 +211,38 @@ dfs_query_and_fetch一样。
 3.3.8 simple_query_string查询
 3.3.9 标识符查询
 3.3.10 前缀查询
-3.3.11 fuzzy_like_this查询
-3.3.14 通配符查询
+### 3.3.11 fuzzy_like_this查询
+``` javascript
+{ 
+ "query" : { 
+ "fuzzy_like_this" : { 
+ "fields" : ["title", "otitle"], 
+ "like_text" : "crime punishment" 
+ } 
+ } 
+}
+```
+fuzzy_like_this查询支持以下查询参数。
+- fields：此参数定义应该执行查询的字段数组，默认值是_all字段
+- like_text：这是一个必需参数，包含用来跟文档比较的文本。
+- ignore_tf：此参数指定在相似度计算期间，是否应忽略词频，默着将使用词频。
+图灵社区会员 打顺顺(lvshun@live.cn) 专享 尊重版权第 3 章 搜索
+max_query_terms：此参数指定生成的查询中能包括的最大查询词条min_similarity：此参数指定差分词条（differencing terms）应该有的认值为0.5。
+prefix_length：此参数指定差分词条的公共前缀长度，默认值为0。
+boost：此参数指定使用的加权值，默认值为1.0。
+analyzer：这个参数定义了分析所提供文本时用到的分析器名称。
+### 3.3.14 通配符查询
+通配符查询允许我们在查询值中使用*和?等通配符。此外，通配符查询跟词条查询在内容方
+面非常类似。可以发送一下查询，来匹配所有包含cr?me词条的文档，这里?表示任意字符：
+``` javascript
+{ 
+ "query" : { 
+ "wildcard" : { 
+ "title" : "cr?me" 
+ } 
+ } 
+}
+```
 3.3.15 more_like_this查询
 3.3.17 范围查询
 3.3.18 最大分查询
@@ -270,3 +310,74 @@ terms过滤器。
 - range
 - term
 - terms
+
+## 3.8 数据排序
+### 3.8.1 默认排序
+### 3.8.2 选择用于排序的字段
+一般来说，对一个未经分析（not_analyzed）的字段排序是一个好主意。
+### 3.8.3 指定缺少字段的行为
+使用数字字段排序时，可以更改Elasticsearch对缺少字段的文档的默认行为。例如以下查询：
+``` javascript
+{ 
+ "query" : { 
+ "match_all" : { } 
+ }, 
+ "sort" : [ 
+ { "section" : { "order" : "asc", "missing" : "_last" } } 
+ ] 
+}
+```
+注意，查询中sort节点的扩展部分添加了missing参数。通过把missing参数设为_last，
+Elasticsearch将把缺乏给定字段的文档放在结果列表的底部。设置为_first，则会把缺乏给定字
+段的文档放在结果列表的顶部。
+### 3.8.4 动态条件
+脚本动态打分（doc_value）,并排序
+``` javascript
+{ 
+ "query" : { 
+ "match_all" : { } 
+ }, 
+ "sort" : { 
+ "_script" : { 
+ "script" : "doc['tags'].values.length > 0 ? 
+ doc['tags'].values[0] : '\u19999'", 
+ "type" : "string", 
+ "order" : "asc" 
+ } 
+ } 
+}
+```
+
+## 3.9 查询重写
+### 3.9.1 查询重写的属性
+可以在任何多项词条查询（比如Elasticsearch的前缀查询和通配符查询）中
+使用rewrite参数来控制查询如何被改写。把rewrite参数添加到负责实际查询的JSON对象中，
+如下所示：
+``` javascript
+{ 
+ "query" : { 
+ "prefix" : { 
+ "title" : "s", 
+ "rewrite" : "constant_score_boolean" 
+ } 
+ } 
+}
+```
+现在，来看看此参数的值有哪些选项。
+- scoring_boolean：这种重写方法把生成的每个词条翻译成布尔查询中的一个should子句。此查询重写方法可能是CPU密集型（因为它计算并存储每个词条的得分），如果查询
+许多词条，可能超过布尔查询极限，也就是1024。此外，此查询会存储计算所得的分数。
+- constant_score_boolean：这种重写方法类似于上面描述的scoring_boolean重写
+方法，但是对CPU要求较低，因为不需要计算得分。相反，每个词条都得到一个与查询
+加权相等的得分，默认是1，可以通过加权属性进行设置。与scoring_boolean重写方
+法类似，该方法也可能达到布尔查询的最高限制。
+- constant_score_filter：就像Apache Lucene的Javadocs声明的那样，这个重写方法按
+顺序访问每个词条，标记该词条的所有文档，并创建一个私有过滤器来重写查询。匹配
+的文档都被赋予一个与查询加权相等的常量得分。当匹配词条或文档的数量很大时，此
+方法比scoring_boolean和constant_score_boolean快。
+- top_terms_N：这种重写方法把生成的每个词条翻译成布尔查询中的一个should子句，
+并保持查询计算所得的分数。然而，与scoring_boolean重写方法不同，它只会保留N
+个最高得分的词条，以免达到布尔查询的最大限制。
+- top_terms_boost_N：这是一种类似top_terms_N的重写方法。然而，与top_terms_N
+重写方法不同，分数只由加权计算而来，而非查询。
+
+# 第4章 扩展索引结构
