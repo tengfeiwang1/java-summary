@@ -37,7 +37,7 @@ https://blog.csdn.net/ychenfeng/article/details/74980531
 
 ## 基础架构及术语
 
-![架构图](../java/pic/kafka架构.png)
+![架构图](../pic/kafka/kafka架构.png)
 - **Producer**：Producer即生产者，消息的产生者，是消息的入口。
   - kafka cluster：
       - Broker：Broker是kafka实例，每个服务器上有一个或多个kafka的实例，我们姑且认为每个broker对应一台服务器。每个kafka集群内的broker都有一个不重复的编号，如图中的broker-0、broker-1等……
@@ -51,11 +51,11 @@ https://blog.csdn.net/ychenfeng/article/details/74980531
 - Zookeeper：kafka集群依赖zookeeper来保存集群的的元信息，来保证系统的可用性。
 ## 工作流分析
 ### 发送数据
-![发送数据](../java/pic/kafka发送数据.png)
+![发送数据](../pic/kafka/kafka发送数据.png)
 tips:消息写入leader后，follower是主动的去leader进行同步的(pull)！
 
 producer采用push模式将数据发布到broker，每条消息追加到分区中，顺序写入磁盘，所以保证**同一分区**内的数据是有序的！写入示意图如下：
-![分区](../java/pic/kafka分区.png)
+![分区](../pic/kafka/kafka分区.png)
 #### 分区的主要目的是：
     1. **方便扩展**。因为一个topic可以有多个partition，所以我们可以通过扩展机器去轻松的应对日益增长的数据量。
     2. **提高并发**。以partition为读写单位，可以多个消费者同时消费数据，提高了消息的处理效率。
@@ -83,7 +83,7 @@ min.insync.replicas: 设置为>=2,保证ISR中至少两个Replica。
 #### partition 结构
 >> Partition在服务器上的表现形式就是一个一个的文件夹，每个partition的文件夹下面会有多组segment文件，**每组segment文件**又包含.index文件、.log文件、.timeindex文件（早期版本中没有）三个文件， log文件就实际是存储message的地方，而index和timeindex文件为索引文件，用于检索消息。
 
-![kafkapartition](../java/pic/kafkapartition.png)
+![kafkapartition](../pic/kafka/kafkapartition.png)
 >> 如上图，这个partition有三组segment文件，每个log文件的大小是一样的，但是存储的message数量是不一定相等的（每条的message大小不一致）。**文件的命名是以该segment最小offset来命名的**，如000.index存储offset为0~368795的消息，kafka就是利用分段+索引的方式来解决查找效率的问题。
 #### Message 结构
 >> 上面说到log文件就实际是存储message的地方，我们在producer往kafka写入的也是一条一条的message，那存储在log中的message是什么样子的呢？消息主要包含消息体、消息大小、offset、压缩类型……等等！我们重点需要知道的是下面三个：
@@ -102,11 +102,11 @@ min.insync.replicas: 设置为>=2,保证ISR中至少两个Replica。
    在讲消息队列通信的两种模式的时候讲到过点对点模式和发布订阅模式。Kafka采用的是**点对点的模式**，消费者主动的去kafka集群拉取消息，与producer相同的是，消费者在拉取消息的时候也是找**leader**去拉取。
 #### 消费者组（consumer group）
    多个消费者可以组成一个消费者组（consumer group），每个消费者组都有一个组id！同一个消费组者的消费者可以消费同一topic下不同分区的数据，但是不会组内多个消费者消费同一分区的数据！！！是不是有点绕。我们看下图：
-   ![kafka消费者组](../java/pic/kafka消费者组.png)
+   ![kafka消费者组](../pic/kafka/kafka消费者组.png)
    图示是消费者组内的消费者小于partition数量的情况，所以会出现某个消费者消费多个partition数据的情况，消费的速度也就不及只处理一个partition的消费者的处理速度！如果是消费者组的消费者多于partition的数量，那会不会出现多个消费者消费同一个partition的数据呢？上面已经提到过不会出现这种情况！多出来的消费者不消费任何partition的数据。所以在实际的应用中，**建议消费者组的consumer的数量与partition的数量一致！**
 #### offset查找message
 查找一个offset为368801的message是过程,如下图：
-![kafka查找message](../java/pic/kafka查找message.png)
+![kafka查找message](../pic/kafka/kafka查找message.png)
 1. 先找到offset的368801message所在的segment文件（利用二分法查找），这里找到的就是在第二个segment文件。
 2. 打开找到的segment中的.index文件（也就是368796.index文件，该文件起始偏移量为368796+1，我们要查找的offset为368801的message在该index内的偏移量为368796+5=368801，所以这里要查找的相对offset为5）。由于该文件采用的是**稀疏索引的方式存储着相对offset**及对应message物理偏移量的关系，所以直接找**相对offset**为5的索引找不到，这里同样利用二分法查找相对offset小于或者等于指定的相对offset的索引条目中**最大的那个相对offset**，所以找到的是相对offset为4的这个索引。
 3. 根据找到的相对offset为4的索引确定message存储的物理偏移位置为256。打开数据文件，从位置为256的那个地方开始顺序扫描直到找到offset为368801的那条Message。
