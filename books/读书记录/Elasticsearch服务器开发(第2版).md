@@ -43,7 +43,21 @@
     - [4.1.1 数据结构](#411-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
     - [4.1.2 分析](#412-%E5%88%86%E6%9E%90)
   - [4.2 索引非扁平数据](#42-%E7%B4%A2%E5%BC%95%E9%9D%9E%E6%89%81%E5%B9%B3%E6%95%B0%E6%8D%AE)
+    - [4.2.3 数组](#423-%E6%95%B0%E7%BB%84)
+    - [4.2.4 映射](#424-%E6%98%A0%E5%B0%84)
     - [4.2.6 动态还是非动态](#426-%E5%8A%A8%E6%80%81%E8%BF%98%E6%98%AF%E9%9D%9E%E5%8A%A8%E6%80%81)
+  - [4.3 使用嵌套对象](#43-%E4%BD%BF%E7%94%A8%E5%B5%8C%E5%A5%97%E5%AF%B9%E8%B1%A1)
+  - [4.4 使用父子关系](#44-%E4%BD%BF%E7%94%A8%E7%88%B6%E5%AD%90%E5%85%B3%E7%B3%BB)
+    - [4.4.2 查询](#442-%E6%9F%A5%E8%AF%A2)
+      - [1. 查询子文档中的数据](#1-%E6%9F%A5%E8%AF%A2%E5%AD%90%E6%96%87%E6%A1%A3%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE)
+      - [2. 查询父文档中的数据](#2-%E6%9F%A5%E8%AF%A2%E7%88%B6%E6%96%87%E6%A1%A3%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE)
+    - [4.4.3 父子关系和过滤](#443-%E7%88%B6%E5%AD%90%E5%85%B3%E7%B3%BB%E5%92%8C%E8%BF%87%E6%BB%A4)
+    - [4.4.4 性能考虑](#444-%E6%80%A7%E8%83%BD%E8%80%83%E8%99%91)
+  - [4.5 使用更新API修改索引数据](#45-%E4%BD%BF%E7%94%A8%E6%9B%B4%E6%96%B0api%E4%BF%AE%E6%94%B9%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE)
+    - [4.5.1 映射](#451-%E6%98%A0%E5%B0%84)
+    - [4.5.2 添加一个新字段](#452-%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%96%B0%E5%AD%97%E6%AE%B5)
+    - [4.5.3 修改字段](#453-%E4%BF%AE%E6%94%B9%E5%AD%97%E6%AE%B5)
+- [第5章 更好的搜索--重点](#%E7%AC%AC5%E7%AB%A0-%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%90%9C%E7%B4%A2--%E9%87%8D%E7%82%B9)
 
 # 第1章 Elasticsearch集群入门
 ## 1.1 全文检索
@@ -500,8 +514,7 @@ curl -XPUT 'localhost:9200/path' -d '{
 位置。例如，在一家汽车店中可以有如下路径：/cars/passenger/sport、/cars/passenger/camper，或者/cars/delivery_truck/。
 
 ### 4.1.2 分析
-运用5.7节中描述
-的分析API，执行以下命令：
+运用5.7节中描述的分析API，执行以下命令：
 curl -XGET 'localhost:9200/path/_analyze?field=category.path&pretty' -d 
 '/cars/passenger/sport' 
 Elasticsearch返回的结果如下所示：
@@ -538,4 +551,163 @@ Elasticsearch返回的结果如下所示：
 档，略过层次结构更深的文档。
 
 ## 4.2 索引非扁平数据
+### 4.2.3 数组
+默认情况下，在Lucene中的所有字段都是 多值的，因此在Elasticsearch中也是一样，这意味着它们可以存储多个值。
+为了索引这些字段， 我们使用JSON数组类型，嵌套在中括号[]中。
+### 4.2.4 映射
+对于对象author，使用数据中同样的名称，除了properties部分，我们还添加了 type属性并设置值为object，告知Elasticsearch应期待一个对象类型。在对象author中嵌套了 对象name，因此author字段的映射如下所示： 
+``` json
+{
+    "author":{
+        "type":"object",
+        "properties":{
+            "name":{
+                "type":"object",
+                "properties":{
+                    "firstName":{
+                        "type":"string",
+                        "index":"analyzed"
+                    },
+                    "lastName":{
+                        "type":"string",
+                        "index":"analyzed"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+firstName和lastName字段在索引中体现为author.name.firstName和author.name. lastName。 
+
 ### 4.2.6 动态还是非动态
+Elasticsearch是无模式的，这意味着不必创建前面的映射就可索引数据。 Elasticsearch的动态行为默认是打开的，但可能想在索引的某些部分把它关掉。为此，可为指定 字段增加属性dynamic，将值设置为false，该属性应该设置在与非动态对象的type属性相同的 级别上。举例来说，如果我们希望对象author和name为非动态，应该将映射文件的相关部分修 改成类似下面这样： 
+``` json
+   "author":{
+        "type":"object",
+        "dynamic":false,
+        "properties":{
+            "name":{
+                "type":"object",
+                "dynamic":false,
+                "properties":{
+                    "firstName":{
+                        "type":"string",
+                        "index":"analyzed"
+                    },
+                    "lastName":{
+                        "type":"string",
+                        "index":"analyzed"
+                    }
+                }
+            }
+        }
+    }
+```
+应记住，为此类对象增加新字段时，应更新映射。 
+## 4.3 使用嵌套对象
+基本上，通过使用嵌套对象，Elasticsearch允许我们连接 一个主文档和多个附属文档。主文档及嵌套文档一同被索引，放置于索引的同一段上（实际在同 一块上），确保为该数据结构获取最佳性能。更改文档也是一样的，除非使用更新API，你需要同时**索引父文档和其他所有嵌套文档**。 
+
+- 评分与嵌套查询 
+在查询过程中处理嵌套文档时，有一个附加属性。除path属性外，还有个score_mode属性， 它允许我们定义如何从嵌套查询中计算得分。在Elasticsearch中可将此属性设置为如下值。 
+- avg：这是默认值。使用这个值时，Elasticsearch可在指定的嵌套查询中计算出平均值。 该平均值包含在主查询的得分中。 
+- total：score_mode属性设置为此值时，Elasticsearch可对每个嵌套查询的得分求和。该 值包含在主查询的得分中。 
+- max：score_mode属性设置为此值时，Elasticsearch可得出嵌套查询的最高得分。该值包 含在主查询的得分中。  none：score_mode属性设置为此值时，Elasticsearch不计算嵌套查询的得分。 
+## 4.4 使用父子关系
+上一节已讨论了索引嵌套文档及其父文档的能力。然而，即使嵌套文档在索引中是作为独立文档检索的，除非使用更新API，否则还是无法更改单个嵌套文档。**而在Elasticsearch中，我们可利用父子关系操作**。请看以下内容。 
+4.4.1 
+### 4.4.2 查询
+当然，也可针对子文档来执行查询并检测其父文档是否存在。然而要注意的是，**针对父文档执行查询时，子文档将无法返回，反之亦然**。 
+#### 1. 查询子文档中的数据
+如果要寻找XXL号的红色衣服，可以运行如下命令行： 
+``` json
+curl -XGET 'localhost:9200/shop/_search?pretty' -d '       
+{
+    "query":{
+        "has_child":{
+            "type":"variation",
+            "query":{
+                "bool":{
+                    "must":[
+                        {
+                            "term":{
+                                "size":"XXL"
+                            }
+                        },
+                        {
+                            "term":{
+                                "color":"red"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}' 
+```
+查询很简单。类型has_child告知Elasticsearch我们想在子文档中搜索。为了指定感兴趣的子类型，指定type属性为子类型的名称。
+- top_children查询 
+除has_child查询之外，Elasticsearch还公开了top_children查询，它查询子文档但返回 父文档。此查询可针对特定数量的子文档，示例如下： 
+```json
+{
+    "query":{
+        "top_children":{
+            "type":"variation",
+            "query":{
+                "term":{
+                    "size":"XXL"
+                }
+            },
+            "score":"max",
+            "factor":10,
+            "incremental_factor":2
+        }
+    }
+}
+```
+1. 上述查询首先在100个子文档中运行（factor乘以size的默认参数10）。
+2. 如果找到10个父文 档（因为默认size的参数值为10），这些文档将返回并结束查询。
+3. 然而，如果返回的父文档数量 较少，且尚有子文档未经查询，那么另外20个子文档将被查询（incremental_factor参数乘 以size），直到找到规定数量的父文档或者所有子文档查询结束为止。 
+
+top_children查询通过使用score参数指定得分的计算方式，可能的参数值包括：max（所 有子查询得分的最大值）、sum（所有子查询得分的总和）或avg（所有子查询得分的平均值）。 
+#### 2. 查询父文档中的数据
+**如果想要返回与父文档中指定数据匹配的子文档**，可使用类似于has_child的查询： has_parent。然而，我们用父文档类型的值指定parent_type属性，而不是type属性。这么这个查询将返回索引的子文档，而不是父文档： 
+curl -XGET 'localhost:9200/shop/_search?pretty' -d '
+{
+    "query":{
+        "has_parent":{
+            "parent_type":"cloth",
+            "query":{
+                "term":{
+                    "name":"test"
+                }
+            }
+        }
+    }
+}'
+
+### 4.4.3 父子关系和过滤
+如果想要将父子查询作为过滤器使用，可以用过滤器has_child和has_parent，它们具备了与has_child和has_parent查询相同的功能。实际上，Elasticsearch将那些过滤器封装为**常数得分查询**，使其可作为查询使用。 
+### 4.4.4 性能考虑
+1. 使用Elasticsearch父子的功能时，必须注意它的性能影响。需要记住的第一件事是父子文档 需要存储在相同的分片中，查询才能够工作。如果单一父文档有大量的子文档，可能导致分片上的文档数量不平均。因此，其中的一个节点的性能会降低，造成整个查询速度变慢。另外，请记住，**比起查询无任何关联的文档，父子查询的速度较慢**。 
+2. 第二个非常重要的事情是，执行has_child等查询时，Elasticsearch需要预加载并缓存文档标识符。这些标识符将存储在内存中，必须确保Elasticsearch有足够的内存。否则，你将得到 OutOfMemory异常，节点或整个集群将无法运作。 
+3. 最后，我们提到过，首次查询将花一定时间预加载和缓存文档标识符。为了提升首次查询父 子关系文档的性能，可以使用预热API。关于如何在Elasticsearch中添加预热查询，请参考8.5节。
+## 4.5 使用更新API修改索引数据
+### 4.5.1 映射
+### 4.5.2 添加一个新字段
+>> tips:在现有类型中添加新字段后，**需要再次对所有文档进行索引**，因为 Elasticsearch不会自动更新。这很关键，可以使用初始数据源或从_source 字段中获得初始数据并再次索引
+### 4.5.3 修改字段
+下修改是**安全**的： 
+- 增加新的类型定义
+- 增加新的字段
+- 增加新的分析器。 
+
+而以下修改是**不允许**或是**无法实现**的： 
+- 更改字段类型（如将文本改为数字）； 
+- 更改“存储到”字段为不存储，反之亦然； 
+- 更改索引属性的值；
+- 更改已索引文档的分析器。 
+注意一点，上述允许和不允许的操作没有涵盖更新API的全部可能性，你必须实际操作以验 证更新是否可行。 
+
+# 第5章  更好的搜索--重点
