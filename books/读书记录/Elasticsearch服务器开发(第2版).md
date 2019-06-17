@@ -1,10 +1,10 @@
-- [第1章 Elasticsearch集群入门](#%E7%AC%AC1%E7%AB%A0-elasticsearch%E9%9B%86%E7%BE%A4%E5%85%A5%E9%97%A8)
+- [第1章 Elasticsearch集群入门](#%E7%AC%AC1%E7%AB%A0-Elasticsearch%E9%9B%86%E7%BE%A4%E5%85%A5%E9%97%A8)
   - [1.1 全文检索](#11-%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2)
-    - [1.1.1 Lucene 词汇表和架构](#111-lucene-%E8%AF%8D%E6%B1%87%E8%A1%A8%E5%92%8C%E6%9E%B6%E6%9E%84)
+    - [1.1.1 Lucene 词汇表和架构](#111-Lucene-%E8%AF%8D%E6%B1%87%E8%A1%A8%E5%92%8C%E6%9E%B6%E6%9E%84)
     - [1.1.2 输入数据分析](#112-%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90)
     - [1.1.3 评分和查询相关性](#113-%E8%AF%84%E5%88%86%E5%92%8C%E6%9F%A5%E8%AF%A2%E7%9B%B8%E5%85%B3%E6%80%A7)
 - [第2章 索引](#%E7%AC%AC2%E7%AB%A0-%E7%B4%A2%E5%BC%95)
-  - [2.1 Elasticsearch索引](#21-elasticsearch%E7%B4%A2%E5%BC%95)
+  - [2.1 Elasticsearch索引](#21-Elasticsearch%E7%B4%A2%E5%BC%95)
   - [2.2 映射配置-mapping](#22-%E6%98%A0%E5%B0%84%E9%85%8D%E7%BD%AE-mapping)
     - [2.2.2 索引结构映射](#222-%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E6%98%A0%E5%B0%84)
       - [3. 核心类型](#3-%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%9E%8B)
@@ -53,17 +53,17 @@
       - [2. 查询父文档中的数据](#2-%E6%9F%A5%E8%AF%A2%E7%88%B6%E6%96%87%E6%A1%A3%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE)
     - [4.4.3 父子关系和过滤](#443-%E7%88%B6%E5%AD%90%E5%85%B3%E7%B3%BB%E5%92%8C%E8%BF%87%E6%BB%A4)
     - [4.4.4 性能考虑](#444-%E6%80%A7%E8%83%BD%E8%80%83%E8%99%91)
-  - [4.5 使用更新API修改索引数据](#45-%E4%BD%BF%E7%94%A8%E6%9B%B4%E6%96%B0api%E4%BF%AE%E6%94%B9%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE)
+  - [4.5 使用更新API修改索引数据](#45-%E4%BD%BF%E7%94%A8%E6%9B%B4%E6%96%B0API%E4%BF%AE%E6%94%B9%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE)
     - [4.5.1 映射](#451-%E6%98%A0%E5%B0%84)
     - [4.5.2 添加一个新字段](#452-%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%96%B0%E5%AD%97%E6%AE%B5)
     - [4.5.3 修改字段](#453-%E4%BF%AE%E6%94%B9%E5%AD%97%E6%AE%B5)
 - [第5章 更好的搜索--重点](#%E7%AC%AC5%E7%AB%A0-%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%90%9C%E7%B4%A2--%E9%87%8D%E7%82%B9)
-  - [5.1 Apache Lucene 评分简介](#51-apache-lucene-%E8%AF%84%E5%88%86%E7%AE%80%E4%BB%8B)
+  - [5.1 Apache Lucene 评分简介](#51-Apache-Lucene-%E8%AF%84%E5%88%86%E7%AE%80%E4%BB%8B)
     - [5.1.1 当文档被匹配时](#511-%E5%BD%93%E6%96%87%E6%A1%A3%E8%A2%AB%E5%8C%B9%E9%85%8D%E6%97%B6)
     - [5.1.2 默认评分公式](#512-%E9%BB%98%E8%AE%A4%E8%AF%84%E5%88%86%E5%85%AC%E5%BC%8F)
-  - [5.2 Elasticsearch 的脚本功能](#52-elasticsearch-%E7%9A%84%E8%84%9A%E6%9C%AC%E5%8A%9F%E8%83%BD)
+  - [5.2 Elasticsearch 的脚本功能](#52-Elasticsearch-%E7%9A%84%E8%84%9A%E6%9C%AC%E5%8A%9F%E8%83%BD)
     - [5.2.1 脚本执行过程中可用的对象](#521-%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%8F%AF%E7%94%A8%E7%9A%84%E5%AF%B9%E8%B1%A1)
-    - [5.2.2 Painless脚本语言（原文是MVEL，1.3.0已废弃）](#522-painless%E8%84%9A%E6%9C%AC%E8%AF%AD%E8%A8%80%E5%8E%9F%E6%96%87%E6%98%AFmvel130%E5%B7%B2%E5%BA%9F%E5%BC%83)
+    - [5.2.2 Painless脚本语言（原文是MVEL，1.3.0已废弃）](#522-Painless%E8%84%9A%E6%9C%AC%E8%AF%AD%E8%A8%80%E5%8E%9F%E6%96%87%E6%98%AFMVEL130%E5%B7%B2%E5%BA%9F%E5%BC%83)
     - [5.2.4 使用自定义脚本库](#524-%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%84%9A%E6%9C%AC%E5%BA%93)
   - [5.3 搜索不同语言的内容](#53-%E6%90%9C%E7%B4%A2%E4%B8%8D%E5%90%8C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AE%B9)
     - [5.3.2 多语言处理](#532-%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86)
@@ -78,6 +78,17 @@
     - [5.6.1 同义词过滤器](#561-%E5%90%8C%E4%B9%89%E8%AF%8D%E8%BF%87%E6%BB%A4%E5%99%A8)
     - [5.6.2 定义同义词规则](#562-%E5%AE%9A%E4%B9%89%E5%90%8C%E4%B9%89%E8%AF%8D%E8%A7%84%E5%88%99)
     - [5.7.2 解释查询](#572-%E8%A7%A3%E9%87%8A%E6%9F%A5%E8%AF%A2)
+- [第6章 超越全文检索](#%E7%AC%AC6%E7%AB%A0-%E8%B6%85%E8%B6%8A%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2)
+  - [6.1 聚合](#61-%E8%81%9A%E5%90%88)
+  - [6.2 切面-推荐由聚合来完成](#62-%E5%88%87%E9%9D%A2-%E6%8E%A8%E8%8D%90%E7%94%B1%E8%81%9A%E5%90%88%E6%9D%A5%E5%AE%8C%E6%88%90)
+  - [6.3 使用建议器](#63-%E4%BD%BF%E7%94%A8%E5%BB%BA%E8%AE%AE%E5%99%A8)
+    - [6.3.1 可用的建议器类型](#631-%E5%8F%AF%E7%94%A8%E7%9A%84%E5%BB%BA%E8%AE%AE%E5%99%A8%E7%B1%BB%E5%9E%8B)
+    - [6.3.2 包含建议器](#632-%E5%8C%85%E5%90%AB%E5%BB%BA%E8%AE%AE%E5%99%A8)
+    - [6.3.3 term建议器](#633-term%E5%BB%BA%E8%AE%AE%E5%99%A8)
+    - [6.3.4 phrase建议器](#634-phrase%E5%BB%BA%E8%AE%AE%E5%99%A8)
+    - [6.3.5 completion建议器](#635-completion%E5%BB%BA%E8%AE%AE%E5%99%A8)
+  - [6.4 预匹配器](#64-%E9%A2%84%E5%8C%B9%E9%85%8D%E5%99%A8)
+  - [6.5 文件的处理](#65-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%84%E7%90%86)
 
 # 第1章 Elasticsearch集群入门
 ## 1.1 全文检索
@@ -930,3 +941,123 @@ Elasticsearch让我们可以解释特定的查询和文档是如何计算
 ```js
 curl -XGET 'localhost:9200/library/book/1/_explain?pretty&q=quiet'
 ```
+
+# 第6章 超越全文检索
+## 6.1 聚合
+6.1.1 一般查询结构
+###6.1.2 可用的聚合
+目前，有两组聚合：度量聚合 （metric aggregation）和桶聚合（bucketing aggregation）。 
+1. 度量聚合
+(1) min,max,sum,avg 聚合
+(2) 使用脚本
+{ "aggs": {      
+  "min_year": {        
+    "min": {          
+      "script": "doc['year'].value - 1000"  
+    }   
+  }  
+  } 
+在本例中，聚合使用的值是原始year字段值减去1000。可以用另外一个写法来得到相同的 响应：提供script属性和字段名，如下所示： 
+{
+  "aggs": {      
+    "min_year": {        
+      "min": {          
+        "field": "year",          
+        "script": "_value - 1000"       
+         }      
+         }    
+         }  
+      }
+(3) value_count聚合
+value_count聚合跟前面描述的聚合类似，只是输入字段不一定要是数值型
+(4) stats 和extended_stats聚合
+stats和extended_stats聚合可以看成是在单一聚合对象中返回所有前面描述聚合的一种聚合。
+2. 桶聚合
+(1) terms聚合
+{"aggs":{
+        "availability":{
+            "terms":{
+                "field":"copies"
+            }
+        }
+    }
+}
+>> tips:你应该记得，当字段被分析时，会从如例子所示的分析词条中得到桶和计数值。这可能不是你想要的答案，解决办法就是在索引中为字段添加一个**额外的、 未经分析的版本**，并使用它来做聚合计算。 
+(2) range 聚合
+from，to
+keyed属性：可以为每个范围添加key属性并把它的值设置为所需的名称。
+(3) date_range聚合
+(4) IPv4_range聚合
+(5) missing聚合
+看看多少条目**没有定义原始标题**（otitle字段）。为此，我们使用 missing聚合，在这种情况下它是个好东西。示例查询如下所示： 
+{ "aggs":{
+        "missing_original_title":{
+            "missing":{
+                "field":"otitle"
+            }
+        }
+    }
+}
+(6) nested聚合
+(7) histogram聚合
+{
+    "aggs":{
+        "years":{
+            "histogram":{
+                "field":"year",
+                "interval":100
+            }
+        }
+    }
+}
+这里，新的信息片段是interval，它定义了将用于创建桶的每个范围的长度。因此，在我们的示例中，桶将以100年为周期来创建。
+(8) date_histogram聚合
+(9) 时区
+(10) geo_distance聚合
+(11) geohash_grid聚合 
+6.1.3 聚合的嵌套
+6.1.4 桶排序和嵌套聚合
+6.1.5 全局和子集
+
+- 包含和排除
+include
+exclude
+## 6.2 切面-推荐由聚合来完成
+## 6.3 使用建议器
+### 6.3.1 可用的建议器类型 
+Elasticsearch提供了以下三种建议器的类型。 
+- term：这种建议器更正每个传入的单词，在非短语查询中很有用，比如单词条查询。 
+- phrase：这种建议器工作在短语上，返回一个恰当的短语。
+- completion：这种建议器旨在提供快速高效的自动完成结果。 
+### 6.3.2 包含建议器
+```js
+curl -XGET 'localhost:9200/library/_search?pretty' -d
+'{
+    "query":{
+        "match_all":{
+
+        }
+    },
+    "suggest":{
+        "text":"serlock holnes",
+        "first_suggestion":{
+            "term":{
+                "field":"_all"
+            }
+        },
+        "second_suggestion":{
+            "term":{
+                "field":"title"
+            }
+        }
+    }
+}'
+```
+### 6.3.3 term建议器
+term建议器基于字符串编辑距离（string edit distance）工作。
+### 6.3.4 phrase建议器
+### 6.3.5 completion建议器
+completion建议器允许我们创建自动完成功能，并且性能很好，这是因为你可以在索引中存储复杂结构，而不是在查询时计算
+
+## 6.4 预匹配器
+## 6.5 文件的处理
