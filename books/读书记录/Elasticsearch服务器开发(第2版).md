@@ -58,6 +58,26 @@
     - [4.5.2 添加一个新字段](#452-%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%96%B0%E5%AD%97%E6%AE%B5)
     - [4.5.3 修改字段](#453-%E4%BF%AE%E6%94%B9%E5%AD%97%E6%AE%B5)
 - [第5章 更好的搜索--重点](#%E7%AC%AC5%E7%AB%A0-%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%90%9C%E7%B4%A2--%E9%87%8D%E7%82%B9)
+  - [5.1 Apache Lucene 评分简介](#51-apache-lucene-%E8%AF%84%E5%88%86%E7%AE%80%E4%BB%8B)
+    - [5.1.1 当文档被匹配时](#511-%E5%BD%93%E6%96%87%E6%A1%A3%E8%A2%AB%E5%8C%B9%E9%85%8D%E6%97%B6)
+    - [5.1.2 默认评分公式](#512-%E9%BB%98%E8%AE%A4%E8%AF%84%E5%88%86%E5%85%AC%E5%BC%8F)
+  - [5.2 Elasticsearch 的脚本功能](#52-elasticsearch-%E7%9A%84%E8%84%9A%E6%9C%AC%E5%8A%9F%E8%83%BD)
+    - [5.2.1 脚本执行过程中可用的对象](#521-%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%8F%AF%E7%94%A8%E7%9A%84%E5%AF%B9%E8%B1%A1)
+    - [5.2.2 Painless脚本语言（原文是MVEL，1.3.0已废弃）](#522-painless%E8%84%9A%E6%9C%AC%E8%AF%AD%E8%A8%80%E5%8E%9F%E6%96%87%E6%98%AFmvel130%E5%B7%B2%E5%BA%9F%E5%BC%83)
+    - [5.2.4 使用自定义脚本库](#524-%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%84%9A%E6%9C%AC%E5%BA%93)
+  - [5.3 搜索不同语言的内容](#53-%E6%90%9C%E7%B4%A2%E4%B8%8D%E5%90%8C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AE%B9)
+    - [5.3.2 多语言处理](#532-%E5%A4%9A%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86)
+    - [5.3.3 检测文档的语言](#533-%E6%A3%80%E6%B5%8B%E6%96%87%E6%A1%A3%E7%9A%84%E8%AF%AD%E8%A8%80)
+  - [5.4 使用查询加权影响得分](#54-%E4%BD%BF%E7%94%A8%E6%9F%A5%E8%AF%A2%E5%8A%A0%E6%9D%83%E5%BD%B1%E5%93%8D%E5%BE%97%E5%88%86)
+    - [5.4.2 为查询添加加权](#542-%E4%B8%BA%E6%9F%A5%E8%AF%A2%E6%B7%BB%E5%8A%A0%E5%8A%A0%E6%9D%83)
+    - [5.4.3 修改得分](#543-%E4%BF%AE%E6%94%B9%E5%BE%97%E5%88%86)
+  - [5.5 索引时加权何时有意义](#55-%E7%B4%A2%E5%BC%95%E6%97%B6%E5%8A%A0%E6%9D%83%E4%BD%95%E6%97%B6%E6%9C%89%E6%84%8F%E4%B9%89)
+    - [5.5.1 在输入数据中定义字段加权](#551-%E5%9C%A8%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%AE%9A%E4%B9%89%E5%AD%97%E6%AE%B5%E5%8A%A0%E6%9D%83)
+    - [5.5.2 在映射中定义加权](#552-%E5%9C%A8%E6%98%A0%E5%B0%84%E4%B8%AD%E5%AE%9A%E4%B9%89%E5%8A%A0%E6%9D%83)
+  - [5.6 同义词](#56-%E5%90%8C%E4%B9%89%E8%AF%8D)
+    - [5.6.1 同义词过滤器](#561-%E5%90%8C%E4%B9%89%E8%AF%8D%E8%BF%87%E6%BB%A4%E5%99%A8)
+    - [5.6.2 定义同义词规则](#562-%E5%AE%9A%E4%B9%89%E5%90%8C%E4%B9%89%E8%AF%8D%E8%A7%84%E5%88%99)
+    - [5.7.2 解释查询](#572-%E8%A7%A3%E9%87%8A%E6%9F%A5%E8%AF%A2)
 
 # 第1章 Elasticsearch集群入门
 ## 1.1 全文检索
@@ -612,7 +632,8 @@ Elasticsearch是无模式的，这意味着不必创建前面的映射就可索�
 在查询过程中处理嵌套文档时，有一个附加属性。除path属性外，还有个score_mode属性， 它允许我们定义如何从嵌套查询中计算得分。在Elasticsearch中可将此属性设置为如下值。 
 - avg：这是默认值。使用这个值时，Elasticsearch可在指定的嵌套查询中计算出平均值。 该平均值包含在主查询的得分中。 
 - total：score_mode属性设置为此值时，Elasticsearch可对每个嵌套查询的得分求和。该 值包含在主查询的得分中。 
-- max：score_mode属性设置为此值时，Elasticsearch可得出嵌套查询的最高得分。该值包 含在主查询的得分中。  none：score_mode属性设置为此值时，Elasticsearch不计算嵌套查询的得分。 
+- max：score_mode属性设置为此值时，Elasticsearch可得出嵌套查询的最高得分。该值包 含在主查询的得分中。 
+- none：score_mode属性设置为此值时，Elasticsearch不计算嵌套查询的得分。 
 ## 4.4 使用父子关系
 上一节已讨论了索引嵌套文档及其父文档的能力。然而，即使嵌套文档在索引中是作为独立文档检索的，除非使用更新API，否则还是无法更改单个嵌套文档。**而在Elasticsearch中，我们可利用父子关系操作**。请看以下内容。 
 4.4.1 
@@ -711,3 +732,201 @@ curl -XGET 'localhost:9200/shop/_search?pretty' -d '
 注意一点，上述允许和不允许的操作没有涵盖更新API的全部可能性，你必须实际操作以验 证更新是否可行。 
 
 # 第5章  更好的搜索--重点
+## 5.1 Apache Lucene 评分简介
+本节将讨论Apache Lucene的默认评分机制：TF/IDF算法，看看它
+如何影响返回的文档。
+tips:TF/IDF算法不是Elasticsearch公开的唯一可用的算法。(参考书：Mastering ElasticSearch)
+### 5.1.1 当文档被匹配时
+Lucene返回文档时，意味着文档与我们发送的查询匹配，并且对该文档已给出一个分数。**得分越高，从搜索引擎的角度来看文档越相关**。然而，两个不同的查询将对同一文档计算出不同的分数。正因为如此，在查询之间比较分数通常没什么意义。
+
+ 评分属性时，考虑以下因素。
+- 文档加权：对文档建立索引时，对文档的加权值。
+- 字段加权：查询和索引时，对字段的加权值。
+- 协调：基于文档词条数的协调因子。对包含更多查询词条的文档，它提供更大的值。
+- 逆文档频率：基于词条的因子，它告诉评分公式，给定词条出现的频率有多低。逆文档
+频率越高，词条越罕见。
+- 长度规范：基于字段的规范化因子，它基于给定字段包含的词条数目。字段越长，该因
+子给的加权值越小。这基本上意味着更短的文档更受分数的青睐。
+- 词频：基于词条的因子，描述给定词条在文档中出现的次数，词频越高，文档的得分越高。
+- 查询规范：基于查询的规范化因子，由每个查询词条比重的平方之和计算而成。查询规
+范用于查询之间的得分比较，但这并不一定很容易，有时甚至做不到。
+### 5.1.2 默认评分公式
+TF-IDF（term frequency–inversedocument frequency）是一种用于资讯检索与资讯探勘的常用加权技术。
+TF：Term Frequency 词频
+IDF：Inverse documentfrequency 倒文档频率
+
+TF/IDF算法的实用计算公式如下：
+![TFIDF](./pic/TFIDF.PNG)
+我们可以看到，文档的评分因子是**查询q**和**文档d**的一个函数。还有两个不直接依赖于查询词条的因子，coord和queryNorm。公式中这两个元素跟查询中的每个词计算而得的总和相乘。另一方面，该总和由给定词的词频、逆文档频率、词条加权和规范相乘而来，其中的规范就是我们前面讨论过的长度规范。
+
+- 影响文档评分的因素：
+- 匹配的词条越罕见，文档的得分越高；
+- 文档的字段越小，文档的得分越高；
+- 字段的加权越高，文档的得分越高；
+- 我们可以看到，文档匹配的查询词条数目越高、字段越少（意味着索引的词条越少），Lucene给文档的分数越高。同时，罕见词条比常见词条更受评分的青睐。
+5.1.3 相关性的意义
+## 5.2 Elasticsearch 的脚本功能
+脚本的属性：
+- script：此属性包含实际的脚本代码。
+- lang：这个属性定义了提供脚本语言信息的字段。如果省略，Elasticsearch假定为Painless。
+- params：此对象包含参数及其值。每个定义的参数可以通过指定参数名称在脚本中使用。
+通过使用参数，我们可以编写更干净的代码。由于可以缓存，使用参数的脚本比嵌入常数的代码执行得更快。
+### 5.2.1 脚本执行过程中可用的对象
+- 在搜索过程中，下列对象是可用的。
+- _doc（也可以用doc）：这是org.elasticsearch.search.lookup.DocLookup对象的实例。通过它可以访问当前找到的文档，附带计算的得分和字段的值。
+- _source：这是个org.elasticsearch. search.lookup.SourceLookup对象的实例，通过它可以访问当前文档的source，以及定义在source中的值。
+- _fields：这是个org.elasticsearch.search.lookup.FieldsLookup对象的实例，通过它可以访问文档的所有字段。
+
+- 在文档更新过程中
+Elasticsearch只通过_source属性公开了ctx对象，通过它可以访问当前文档。
+### 5.2.2 Painless脚本语言（原文是MVEL，1.3.0已废弃）
+painless是一种简单，安全的脚本语言，专为与Elasticsearch一起使用而设计，它是Elasticsearch的默认脚本语言，可以安全地用于内联和存储脚本，有关painless语法和语言功能的详细说明，请参阅Painless语言规范。
+你可以在Elasticsearch中使用脚本的任何地方使用Painless脚本，Painless提供：
+- 性能快：Painless脚本运行速度比备选方案快几倍。
+- 安全：具有方法调用/字段粒度的细粒度白名单，有关可用类和方法的完整列表，请参阅Painless API参考。
+- 可选输入：变量和参数可以使用显式类型或动态def类型。
+- 语法：扩展Java的语法，以提供Groovy样式的脚本语言功能，使脚本更易于编写。
+优化：专为Elasticsearch脚本编写而设计。
+
+### 5.2.4 使用自定义脚本库
+
+- 使用本地代码
+(1) 工厂实现类
+实现org.elasticsearch.script.NativeScriptFactory类。该接口强制我们实现newScript()方法。它接收定义在API请求中的参数，返回脚本的一个实例。
+(2) 实现本地脚本
+我们的类从org.elasticsearch.script.AbstractSearchScript类继承并实现
+run()方法。该方法从当前文档中得到适当的值，并且根据我们的奇怪逻辑来处理后，返回一个结果。你可能注意到了source()，没错，它和我们在非本地脚本中碰到的_source参数完全一样。doc()和fields()方法同样是可用的，与之前描述的逻辑一样。
+(3) 安装脚本
+在把已编译的类封装成JAR归档后，应该把它放在Elasticsearch的lib目录，这使我们的代码对类加载器可见。我们应该做的是注册脚本，可以通过Setting API调用来实现或在elasticsearch.yml配置文件添加一行。
+(4) 执行脚本
+```json
+{ 
+  "query" : { 
+  "match_all" : { } 
+  }, 
+  "sort" : { 
+  "_script" : { 
+  "script" : "native_sort" "params" : { 
+  "field" : "otitle" 
+  }, 
+  "lang" : "native", 
+  "type" : "string", 
+  "order" : "asc" 
+  } 
+  } 
+}
+```
+提供native_sort作为脚本名字、native作为脚本语言
+## 5.3 搜索不同语言的内容
+### 5.3.2 多语言处理
+### 5.3.3 检测文档的语言
+- Apache Tika（http://tika.apache.org/）；
+- Language detection（http://code.google.com/p/language-detection/）
+## 5.4 使用查询加权影响得分
+### 5.4.2 为查询添加加权
+字段加权查询
+```json
+{ 
+  "query" : { 
+  "query_string" : { 
+  "fields" : ["from^5", "to^10", "subject"], 
+  "query" : "john", 
+  "use_dis_max" : false 
+  } 
+  } 
+}
+```
+通过这种方式，可以告诉Elasticsearch给定字段的重要程度。我们看最重要的字段是to，其次是from。subject字段的boost为默认值，即1.0。
+
+字段加权bool查询，如下所示：
+```json
+{ 
+ "query" : { 
+ "bool" : { 
+ "should" : [ 
+ { "term" : { "from": { "value" : "john", "boost" : 5 }}}, 
+ { "term" : { "to": { "value" : "john", "boost" : 10 }}}, 
+ { "term" : { "subject": { "value" : "john" }}} 
+ ] 
+ } 
+ } 
+}
+```
+### 5.4.3 修改得分
+1. constant_score查询
+constant_score查询允许我们对任何过滤器或查询明确设置一个被用作得分的值，它将通
+过加权参数赋给每个匹配文档。默认是1.0
+2. 加权查询
+它允许我们定义一个查询的额外部分，用于降低匹配文档的得分。negative_boost
+3. function_score查询-P154
+
+## 5.5 索引时加权何时有意义
+我们获得独立于查询的一个加权，成本是重建索引（在加权值变化时，我们需要重建索引）。此外，由于加权过程中已经在索引时计算，性能会稍好一些。Elasticsearch把加权的信息存储为规范化信息的一部分。很重要的是，如果把omit_norms设置为true，就不能使用索引时加权。
+
+### 5.5.1 在输入数据中定义字段加权
+如果想为这个特定文档的author字段加权，结构应该会略有变化，文档看起来应该如下所示：
+```json
+{ 
+ "title" : "The Complete Sherlock Holmes", 
+ "author" : { 
+ "_value" : "Arthur Conan Doyle", 
+ "_boost" : 10.0, 
+ }, 
+ "year": 1936 
+}
+```
+### 5.5.2 在映射中定义加权
+可以直接在映射文件中定义字段的加权。下面的示例演示了这一点：
+```json 
+{ 
+ "mappings" : { 
+ "book" : { 
+ "properties" : { 
+ "title" : { "type" : "string" }, 
+ "author" : { "type" : "string", "boost" : 10.0 } 
+ } 
+ } 
+ } 
+}
+```
+
+## 5.6 同义词
+### 5.6.1 同义词过滤器
+为了使用同义词过滤器，我们需要定义自己的分析器，称为**synonym**，使用空格分词器和一个叫synonym的过滤器。该过滤器的类型属性必须设置为synonym，它告诉Elasticsearch，该过滤器是一个同义词过滤器。此外，我们希望忽略大小写，对大写和小写的同义词一视同仁（设置**ignore_case属性为true**）。
+
+1. 映射中的同义词
+"synonyms" : [ 
+ "crime => criminality" 
+]
+2. 存储在文件系统中的同义词
+"filter" : { 
+ "synonym" : { 
+ "type" : "synonym", 
+ "synonyms_path" : "synonyms.txt" 
+ } 
+}
+### 5.6.2 定义同义词规则
+1. 使用Apache Solr同义词
+2. 使用WordNet同义词
+
+##5.7 理解解释信息
+###5.7.1 理解字段分析
+1. Elasticsearch提供一个专门的REST API端点，**_analyze**。
+让我们先看Elasticsearch的默认分析器返回的信息。运行以下命令：
+curl -XGET 'localhost:9200/_analyze?pretty' -d 'Crime and Punishment'
+
+2. 有另一种分析API的可用形式：我们能够提供分词器和过滤器。要在创建目
+标映射之前实验一下配置时，它非常方便。调用的示例如下所示：
+``` js
+curl -XGET 
+ 'localhost:9200/library/_analyze?tokenizer=whitespace& 
+ filters=lowercase,kstem&pretty' -d 'John Smith' 
+```
+上面的例子使用了一个分析器，它由whitespace分词器和两个过滤器（lowercase和kstem）组成。可以看到，分析API可以**非常有效地跟踪映射配置中的错误**，对**解决查询和搜索相关性问题也非常有用**。它可以告诉我们分析器如何工作，它们生成的词条是什么，这些词条的属性是什么。有了这些资料，分析查询问题会更容易追踪。
+
+### 5.7.2 解释查询
+Elasticsearch让我们可以解释特定的查询和文档是如何计算
+得分的(_explain)。看下面的示例：
+```js
+curl -XGET 'localhost:9200/library/book/1/_explain?pretty&q=quiet'
+```
