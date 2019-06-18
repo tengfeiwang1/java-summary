@@ -31,7 +31,7 @@
   CAS（Compare and swap）比较和替换是设计并发算法时用到的一种技术。
 
 - 底层实现:
-    使用Unsafe类，都是native方法，unsafe底层实现是汇编的cmpxchg 实现，处理器执行cmpxchg是原子性操作（如果是多处理器，也需要对cmpxchg操作使用lock指令加锁）。
+    使用Unsafe类，都是native方法，unsafe底层实现是汇编的cmpxchg 实现，处理器执行cmpxchg是原子性操作（**如果是多处理器，也需要对cmpxchg操作使用lock指令加锁**）。
     
     CAS基于硬件实现，不需要进入内核，不需要切换线程，操作自旋几率较少，因此可以获得更高的性能。
 
@@ -128,7 +128,7 @@ http://ifeve.com/concurrent-collections-1/
 　　PriorityBlockingQueue    并发情况下的有限队列
 　　LinkedBlockingQueue    与 ArrayBlockingQueue 功能一致，但是 LinkedBlockingQueue 是无界的
 　　LinkedBlockingDueue    LinkedBlockingQueue 的双向队列版本
-　　SynchronousQueue    异步队列，每个插入操作必须等待另一个线程的对应移除操作，反之亦然。
+　　SynchronousQueue    同步阻塞队列，每个插入操作必须等待另一个线程的对应移除操作，反之亦然。
 　　DelayQueue    延时执行任务的队列
 　　LinkedTransferQueue    提供与 SynchronousQueue 类似的功能，但具有嗅探功能，可以尝试性地添加一些数据
    
@@ -151,7 +151,8 @@ http://ifeve.com/concurrent-collections-8/
 
   - AtomicInteger：volatile value计算，cas更新数据，效率低于LongAdder
   
-    在同一个代码块中使用两个或以上atomic变量，会导致原子性丢失
+    //在同一个代码块中使用两个或以上atomic变量操作，会导致原子性丢失
+    同一个代码块中，对单个atomic变量进行2次或2次以上的操作，会导致原子性丢失
   - LongAdder(JDK 1.8): cells[]分段计算，依赖cas,最后sum汇总，高并发时效率最高
     add方法会动态扩展：根据并发数量/线程数量进行扩展，并且动态扩容
 https://www.cnblogs.com/rickzhai/p/7936758.html

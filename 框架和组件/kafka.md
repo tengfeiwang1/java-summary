@@ -172,3 +172,6 @@ consumer
 多partition消费
 
 手动提交事务
+
+
+[参数配置](https://www.cnblogs.com/jun1019/p/6256371.html)
