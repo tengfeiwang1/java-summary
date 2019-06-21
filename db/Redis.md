@@ -1,6 +1,6 @@
 
 # Redis
-http://www.cnblogs.com/guozefeng/p/6907456.html
+[原理和使用](http://www.cnblogs.com/guozefeng/p/6907456.html)
 * 简介
 简单来说 Redis 就是一个数据库，不过与传统数据库不同的是 redis 的数据是存在内存中的，所以存写速度非常快，因此 redis 被广泛应用于缓存方向。另外，redis 也经常用来做分布式锁。redis 提供了多种数据类型来支持不同的业务场景。除此之外，redis 支持事务 、持久化、LUA脚本、LRU驱动事件、多种集群方案。
 * Redis 与其他 key - value 缓存产品有以下三个特点
@@ -10,6 +10,7 @@ http://www.cnblogs.com/guozefeng/p/6907456.html
 
 ## 结构特点
 1. 所有的redis节点彼此互联(**PING-PONG机制**),内部使用二进制协议优化传输速度和带宽。
+[PING-PONG](https://blog.csdn.net/Your__Highness/article/details/89420084)
 2. 节点的fail是通过集群中超过半数的节点检测失效时才生效。
 3. 客户端与redis节点直连,不需要中间proxy层.客户端不需要连接集群所有节点,连接集群中任何一个可用节点即可。
 4. redis-cluster把所有的物理节点映射到[0-16383]slot上（不一定是平均分配）,cluster 负责维护node<->slot<->value。
@@ -28,6 +29,7 @@ redis cluster 默认分配了 **16384** 个slot，当我们set一个key 时，�
 具体算法就是：CRC16(key) % 16384。所以我们在测试的时候看到set 和 get 的时候，直接跳转到了7000端口的节点。
 
 ## 持久化方式RDB,AOF
+[详解](https://www.cnblogs.com/itdragon/p/7906481.html)
 * AOF(append only file): 会消耗一部分性能，但是可以提高缓存一致性
 * RDB:s 提高频繁写性能，不启用备份来换取性能（可以通过save命令做备份）
 
