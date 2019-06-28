@@ -125,12 +125,12 @@ discovery.zen.ping_timeout 仅在选举主节点的时候，这个超时机制�
 shard = hash(document_id or routing parameter) % (num_of_primary_shards)
 ```
 而主分片本身是分散在集群各个机器之中的，这里就相当于一次**主分片的LB**。
-2. 接下来都是在 shard 中进行操作了，先是写入 **Transaction Log**(后续会有详细介绍)，而后将数据写入内存中，默认情况下每隔一秒会同步到 **FileSystem cache** 中，FS Cache 拥有文件句柄，因此存在于 FS cache 中的数据是允许被搜索到的（ready for search），这也是 ES 能够实现 NRT（Near-Real-Time）这个特性的原因之一。当然对数据实时性要求高的可以调用 Refresh API。
-默认情况下每隔30s 会将 FS cache中的 index 以及 Transaction Log 一并写入磁盘中，当然为了降低数据丢失的概率，可以将这个时间缩短，甚至设置成同步的形式。
+2. 接下来都是在 shard 中进行操作了，先是写入 **Transaction Log**(后续会有详细介绍)，而后将数据写入**内存**中，默认情况下每隔一秒会同步到 **FileSystem cache** 中，FS Cache 拥有文件句柄，因此存在于 FS cache 中的数据是允许被搜索到的（ready for search），这也是 ES 能够实现 NRT（Near-Real-Time）这个特性的原因之一。当然对数据实时性要求高的可以调用 Refresh API。
+默认情况下每隔30s 会将FS cache中的 index以及 Transaction Log一并写入磁盘中，当然为了降低数据丢失的概率，可以将这个时间缩短，甚至设置成同步的形式。
 
 ### TransLog
-TransLog （即所谓的写前日志WAL，Write Ahead Log）的机制与 MySQL 的 binlog，HBase 的 Hlog 并无太大差别。TransLog 本身是写入到 FS cache 的，什么时候 fsync 到磁盘取决于数据能接受丢失的程度。
-换句话说，如果需要 ES 具备十分强悍的写入能力，数据丢了一部分也没太大关系，这种情况你可以将 fsync 设置为异步执行的，并且把 fsync 的时间间隔设置的很长；如果你需要非常严谨的数据，不能够接受丢失数据，那么你可能在每次写入 TransLog 的时候都要 fsync 一次（这是默认机制）。
+TransLog （即所谓的写前日志WAL，Write Ahead Log）的机制与 MySQL 的 binlog，HBase 的 Hlog 并无太大差别。TransLog 本身是写入到FS cache 的，什么时候 fsync 到磁盘取决于数据能接受丢失的程度。
+换句话说，如果需要 ES 具备十分强悍的写入能力，数据丢了一部分也没太大关系，这种情况你可以将 fsync 设置为异步执行的，并且把 fsync 的时间间隔设置的很长；如果你需要非常严谨的数据，不能够接受丢失数据，那么你可能在每次写入 TransLog的时候都要 fsync一次（这是默认机制）。
 然而业务并非总是这么理想化，现实中同样需要在**可用性与一致性**两者之间做权衡。
 
 - 下面介绍 TransLog 的相关配置。
@@ -144,13 +144,13 @@ TransLog （即所谓的写前日志WAL，Write Ahead Log）的机制与 MySQL �
 值得一提，默认情况下每隔三十分钟会 Flush 一次。但一般情况下不会手动调整清洗策略。
 >> Tips: An Elasticsearch flush is the process of performing a Lucene commit and starting a new translog.
 
-ES 的Flush操作包含了Lucene索引的fsync以及 Translog 的清空，两个操作，因此日志清洗并不会导致数据丢失！
+ES 的Flush操作包含了Lucene索引的fsync以及 Translog的清空，两个操作，因此日志清洗并不会导致数据丢失！
 
 数据恢复的话这里没什么好说的，和其他分布式存储的 WAL 基本一致，从磁盘读取出 TransLog，然后 Replay 即可。
 
 ### ES 如何写 replicas？
 找到对应的 shard 之后，会预先检查 replicas 数量，开始写replicas，此时支持三种策略，quorum、one和 all，**默认为 quorum（超过半数副本写入即可返回成功）**，对应参数 wait_for_active_shards。
->> Tips: 每一个 replicas shard 中的写逻辑是和 primary shard 一样的。
+>> Tips: 每一个 replicas shard中的写逻辑是和 primary shard一样的。
 
 ## 更新 & 删除文档操作
 - 删除： 每个段中维护一个.del 文件，ES 只是逻辑删除文档，在.del 文件中标记为已删除，查询依然可以查到，但是会在结果中过滤掉；
