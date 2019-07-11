@@ -463,10 +463,53 @@ http://www.wklken.me/posts/2015/05/23/elasticsearch-issues.html
 ## 模板
 ## query
 ## agg
+agg主要适用于doc_value字段
 ## script
+脚本可以实现查询、过滤、聚合等
 ## search after
+实现深入分页-不支持跳页
+
+需要排序，不然数据会错乱：order  field
+
 ## scroll
+多线程并发会造成cpu和内存消耗过高
+
 ## 优化
 https://www.bbsmax.com/A/mo5kY2QzwR/
 ### 写入
+1.为了提高入库效率，使用bulk写入：
+``` json
+"setting":{
+  "index":{
+    "code":"best_compression",//压缩算法
+    "number_of_replicas":0,//备份
+    "refresh_interval":"120s,"//刷新周期
+    "number_of_shards":"10", //分片数
+    "max_result_window":"100000", //bulk队列最大数量
+    "translog": {
+      "flush_threshold_size": "1gb",
+      "sync_interval":"120s",
+      "durability": "async"
+    },
+    //index 字段限制
+    "mapping": {
+      "total_fields":{
+        "limit":"10000"
+      }
+    }
+  },
+  //大小写敏感
+  "analysis": {
+    "normalizer": {
+      "my_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter":[
+          "lowercase","asciifolding"
+        ]
+      }
+    }
+  }
+}
+```
 ### 
