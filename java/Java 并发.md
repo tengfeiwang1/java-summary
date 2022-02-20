@@ -1,18 +1,18 @@
-- [概念](#%E6%A6%82%E5%BF%B5)
-- [原子操作](#%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C)
+- [概念](#概念)
+- [原子操作](#原子操作)
   - [CAS](#cas)
-- [多线程](#%E5%A4%9A%E7%BA%BF%E7%A8%8B)
-  - [多线程开发良好的实践](#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91%E8%89%AF%E5%A5%BD%E7%9A%84%E5%AE%9E%E8%B7%B5)
-- [并发包(J.U.C)](#%E5%B9%B6%E5%8F%91%E5%8C%85juc)
+- [多线程](#多线程)
+  - [多线程开发良好的实践](#多线程开发良好的实践)
+- [并发包(J.U.C)](#并发包juc)
   - [AQS--AbstractQueuedSynchronizer](#aqs--abstractqueuedsynchronizer)
-    - [框架](#%E6%A1%86%E6%9E%B6)
-    - [AQS源码详解](#aqs%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3)
-  - [JUC下的同步器](#juc%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%99%A8)
-  - [并发集合---concurrent](#%E5%B9%B6%E5%8F%91%E9%9B%86%E5%90%88---concurrent)
-  - [原子类--Atomic](#%E5%8E%9F%E5%AD%90%E7%B1%BB--atomic)
-  - [BlockingQueue--阻塞队列](#blockingqueue--%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97)
+    - [框架](#框架)
+    - [AQS源码详解](#aqs源码详解)
+  - [JUC下的同步器](#juc下的同步器)
+  - [并发集合---concurrent](#并发集合---concurrent)
+  - [原子类--Atomic](#原子类--atomic)
+  - [BlockingQueue--阻塞队列](#blockingqueue--阻塞队列)
   - [ThreadLocal](#threadlocal)
-    - [原理](#%E5%8E%9F%E7%90%86)
+    - [原理](#原理)
 
 # 概念
   - 串行
@@ -99,6 +99,8 @@
 
 ### AQS源码详解
 [AQS源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
+
+>> LockSupport是AQS的底层线程实现类
 
 ## JUC下的同步器
   1. ReentrantLock-独享模式

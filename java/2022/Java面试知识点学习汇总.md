@@ -10,3 +10,7 @@ AQS详解
 
 
 https://www.bilibili.com/video/BV1bX4y1P7W5?p=2
+
+## JVM 和指令
+
+javap反编译class文件为txt，可以看到编译好的指令代码

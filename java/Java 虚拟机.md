@@ -24,10 +24,15 @@
 # JVM内存结构
 ## JVM运行态数据分区(内存结构)
 ![JVM内存结构](./pic/JVM内存结构.png)
-d
+
 ![JVM内存结构对比](./pic/JVM内存结构对比.png)
 [详解](https://www.cnblogs.com/dingyingsi/p/3760447.html)
 [元空间详解](https://blog.csdn.net/zhushuai1221/article/details/52122880)
+
+## JVM内存分配比例
+老年代默认2/3
+新生代1/3 （eden：80%，survivor0：10%，survivor1:10%）
+
 
 ## Java内存模型(JMM:Java Memory Model)
 
@@ -39,7 +44,7 @@ d
 ## Java对象模型
 >> Java是一种面向对象的语言，而Java对象在JVM中的存储也是有一定的结构的。而这个关于**Java对象自身的存储模型称之为Java对象模型**。
 HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Pointer）指的是普通对象指针，而Klass用来描述对象实例的具体类型。
-每一个Java类，在被JVM加载的时候，JVM会给这个类创建一个instanceKlass，保存在方法区，用来在JVM层表示该Java类。当我们在Java代码中，使用new创建一个对象的时候，JVM会创建一个instanceOopDesc对象，这个对象中包含了对象头以及实例数据,存储在堆区。
+每一个Java类，在被JVM加载的时候，JVM会给这个类创建一个instanceKlass，保存在方法区，用来在JVM层表示该Java类。当我们在Java代码中，使用new创建一个对象的时候，JVM会创建一个instanceOopDesc对象，这个对象中包含了对象头:![对象头](./pic/Object对象头.png)以及实例数据,存储在堆区。
 ![Java对象模型](./pic/OOP-Klass模型.jpg)
 
 # GC算法
@@ -80,6 +85,9 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 
 ## 垃圾收集器
 如果说收集算法是内存回收的方法论，垃圾收集器就是内存回收的具体实现
+
+垃圾收集器:![垃圾收集器](./pic/垃圾收集器.png)
+
 
 ### Serial收集器:串行收集器
 
@@ -133,7 +141,35 @@ HotSpot虚拟机中，设计了一个OOP-Klass Model。OOP（Ordinary Object Poi
 
 >> 使用G1收集器时，Java堆的内存布局与其他收集器有很大差别，它将整个Java堆划分为多个大小相等的独立区域（Region），虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔阂了，它们都是一部分（可以不连续）Region的集合。
 
-- 收集步骤
+#### G1的内存划分和主要收集过程
+G1收集回收器将堆进行分区，划分为一个个的区域，每次收集的时候，只收集其中几个区域，以此来控制垃圾回收产生一次停顿时间。
+G1的收集过程可能有4个阶段：
+- 新生代GC
+- 并发标记周期
+- 混合收集
+- （如果需要）进行Full GC。
+
+##### G1提供了两种GC模式：
+- Young GC
+选定所有年轻代里的Region。通过控制年轻代的region个数，即年轻代内存大小，来控制young GC的时间开销。
+
+- Mixed GC（非Full GC）
+选定所有年轻代里的Region，外加根据global concurrent marking统计得出收集收益高的若干老年代Region。
+
+在用户指定的开销目标范围内尽可能选择收益高的老年代Region。（只能回收老年代部分region）
+>> 注：Young GC和Mixed GC，两种都是完全Stop The World的。
+如果mixed GC实在无法跟上程序分配内存的速度，导致老年代填满无法继续进行Mixed GC，就会使用serial old GC（full GC）来收集整个GC heap。
+
+
+来源: 哈利路牙儿
+文章作者: specialID
+文章链接: https://giteedev.gitee.io/yyz-coder/2020/07/26/G1%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E8%AE%B2%E8%A7%A3/
+本文章著作权归作者所有，任何形式的转载都请注明出处。
+
+
+
+
+- G1并发标记周期步骤 （global concurrent marking：并发标记周期针对老年代）
 1. **标记阶段**，首先初始标记(Initial-Mark),这个阶段是**停顿的(Stop the World Event)**，并且会触发一次普通Minor GC。对应GC log:GC pause (young) (inital-mark)
 2. **Root Region Scanning**，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。
 3. **Concurrent Marking**，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。
@@ -192,3 +228,9 @@ jmap
 jstack
 
 heap dump： jmap ， kill -3 pid
+##  Arthas诊断Java进程
+https://arthas.aliyun.com/doc/
+
+
+
+
