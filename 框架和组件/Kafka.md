@@ -175,3 +175,26 @@ consumer
 
 
 [参数配置](https://www.cnblogs.com/jun1019/p/6256371.html)
+
+
+
+## Kafka幂等性
+**幂等，就是指多接口的多次调用所产生的结果和只调用一次是一致的**。没有幂等性的情况下就会重复发送数据，如下图所示:
+
+
+
+    Kafka的幂等性机制能保证单个分区不会重复写入数据，而实现幂等性的核心就是引入了producer id 和 sequence number这两个概念。
+
+    Kafka内部会自动为每个Producer分配一个producer id(PID)，broker端会为producer每个Partition维护一个<PID,Partition> -> sequence number映射。sequence number时从0开始单调递增的。
+
+对于新接受到的消息，broker端会进行如下判断：
+1.如果新消息的sequence number正好是broker端维护的<PID,Partition> -> sequence number大1，说broker会接受处理这条消息。
+2.如果新消息的sequence number比broker端维护的sequence number要小，说明时重复消息，broker可以将其直接丢弃
+3.如果新消息的sequence number比broker端维护的sequence number要大过1，说明中间存在了丢数据的情况，那么会响应该情况，对应的Producer会抛出OutOfOrderSequenceException。
+
+kafka 幂等性和事务：https://www.cnblogs.com/smartloli/p/11922639.html
+
+FLink集合Kafka的幂等性和事务：https://blog.csdn.net/zc19921215/article/details/108466393#:~:text=Kafka%E5%B9%82%E7%AD%89%E6%80%A7%EF%BC%9A,%E8%B0%83%E7%94%A8%E4%B8%80%E6%AC%A1%E6%98%AF%E4%B8%80%E8%87%B4%E7%9A%84%E3%80%82&text=Kafka%E7%9A%84%E5%B9%82%E7%AD%89%E6%80%A7%E6%9C%BA%E5%88%B6%E8%83%BD%E4%BF%9D%E8%AF%81%E5%8D%95%E4%B8%AA%E5%88%86%E5%8C%BA,number%E8%BF%99%E4%B8%A4%E4%B8%AA%E6%A6%82%E5%BF%B5%E3%80%82
+
+## Kafka事务
+  Kafka事务性主要是为了解决幂等性无法跨Partition运作的问题，事务性提供了多个Partition写入的原子性，即写入多个Partition要么全部成功，要么全部失败，不会出现部分成功部分失败这种情况。
