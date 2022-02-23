@@ -47,7 +47,7 @@ IOC思想基于IOC容器完成，IOC容器底层就是对象工厂，实际上�
 - AOP操作
   - Spring框架一般是使用AspectJ的Annotation，基于JDK的动态代理实现AOP操作，AspectJ不是Spring的组成部分，独立AOP框架，一般把AspectJ和Spring框架一起使用，进行AOP操作。
 
-  >> 曾经以为AspectJ是Spring AOP一部分，是因为Spring AOP使用了AspectJ的Annotation。使用了Aspect来定义切面,使用Pointcut来定义切入点，使用Advice来定义增强处理。虽然使用了Aspect的Annotation，但是并没有使用它的编译器和织入器。其实现原理是JDK的动态代理，在运行时生成代理类。代理类的生成由IOC容器负责处理和缓存
+  >> 曾经以为AspectJ是Spring AOP一部分，是因为Spring AOP使用了AspectJ的Annotation。使用了Aspect来定义切面,使用Pointcut来定义切入点，使用Advice来定义增强处理。虽然使用了Aspect的Annotation，但是并没有使用它的编译器和织入器。其实现原理是基于JDK和CGLIB的动态代理，在运行时生成代理类。代理类的生成由IOC容器负责处理和缓存
 
   >>"一般来说，编译时增强(AspectJ的实现方式)的 AOP 框架在性能上更有优势——--因为运行时动态增强的 AOP 框架需要每次运行时都进行动态增强。"
     通常情况下代理类应该都会被IOC容器缓存起来, 首次增强的类型之后就不需要在增强了。
