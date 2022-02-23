@@ -133,19 +133,19 @@ Class clazz = Class.forName("com.test.Person");
 3. 动态代理也叫做:JDK代理,接口代理
 
 * 代理类所在包:java.lang.reflect.Proxy
-JDK实现代理只需要使用newProxyInstance方法,但是该方法需要接收三个参数,完整的写法是:
+JDK实现代理只需要使用**newProxyInstance**方法,但是该方法需要接收三个参数,完整的写法是:
  ``` java
  static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces,InvocationHandler h )
  ```
  >> 注意该方法是在Proxy类中是静态方法,且接收的三个参数依次为:
 >>> ClassLoader loader,:指定当前目标对象使用类加载器,获取加载器的方法是固定的
 >>> Class<?>[] interfaces,:目标对象实现的接口的类型,使用泛型方式确认类型
->>> InvocationHandler h:事件处理,执行目标对象的方法时,会触发事件处理器的方法,会把当前执行目标对象的方法作为参数传入
+>>> InvocationHandler h:事件处理,执行目标对象的方法时,会触发事件处理器的方法,会把当前执行目标对象的方法作为参数传入。实现InvocationHandler这个接口，创建代理对象，写增强方法。
 
 * 总结:
-代理对象不需要实现接口,但是目标对象一定要实现接口,否则不能用动态代理
+代理对象不需要实现接口,但是*目标对象一定要实现接口*,否则不能用动态代理
 
-## Cglib代理--实现原理：FastClass对Class对象进行特别的处理，比如将会用数组保存method的引用，每次调用方法的时候都是通过一个index下标来保持对方法的引用。
+## Cglib代理--实现原理：FastClass对Class对象进行特别的处理，比如用数组保存method的引用，每次调用方法的时候都是通过一个index下标来保持对方法的引用。
 上面的静态代理和动态代理模式都是*要求目标对象是实现一个接口的目标对象*,但是有时候目标对象只是一个单独的对象,并没有实现任何的接口,这个时候就可以使用以目标对象子类的方式类实现代理,这种方法就叫做:Cglib代理
 
 >> Cglib代理,也**叫作子类代理**,它是在内存中构建一个子类对象从而实现对目标对象功能的扩展.
@@ -158,6 +158,13 @@ JDK实现代理只需要使用newProxyInstance方法,但是该方法需要接收
 2. 引入功能包后,就可以在内存中动态构建子类
 3. **代理的类不能为final,否则报错**(final类 不能继承)
 4. 目标对象的方法如果为final/static,那么就不会被拦截,即不会执行目标对象额外的业务方法.
+
+- 小结
+  - CGlib可以传入接口也可以传入普通的类，接口使用实现的方式,普通类使用会使用继承的方式生成代理类.
+  - 由于是继承方式,如果是 static方法,private方法,final方法等描述的方法是不能被代理的
+  - 做了方法访问优化，使用建立方法索引的方式避免了传统Method的方法反射调用.
+  - 提供callback 和filter设计，可以灵活地给不同的方法绑定不同的callback。编码更方便灵活。
+  - CGLIB会默认代理Object中finalize,equals,toString,hashCode,clone等方法。比JDK代理多了finalize和clone。
 
 
 # 一致性Hash
