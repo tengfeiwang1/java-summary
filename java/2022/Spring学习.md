@@ -13,6 +13,11 @@ IOC是个容器（ApplicationContext容器）：控制反转，依赖注入
 
 - IOC容器
 IOC思想基于IOC容器完成，IOC容器底层就是对象工厂，实际上就是个Map，里面存的是各种对象，根据全限定类名使用反射创建对象放到map里。在代码里需要使用对象时，通过ID注入（autowired,resource等注解，会根据类型或者name（对象名）注入）。
+ @Autowired: 根据类型进行自动装配
+ @Qualifier：根据名称进行注入，需要和Autowired一起使用
+ @Resource：可以根据类型输入，也可以根据名称注入
+ @Value: 注入普通类型属性
+
   - IOC容器实现两种方式（两个接口）
     - BeanFactory：IOC容器基本实现，是Spring内部得使用接口，不提供开发人员进行使用
       - 懒加载：加载配置文件时不会创建对象，在获取对象（使用）时才去创建对象
@@ -22,6 +27,15 @@ IOC思想基于IOC容器完成，IOC容器底层就是对象工厂，实际上�
       - ApplicationContext实现类：
 - 依赖注入
 “获得依赖对象的过程被反转了”。控制被反转之后，获得依赖对象的过程由自身管理变为了由IOC容器主动注入。依赖注入是实现IOC的方法，就是由IOC容器在运行期间，动态地将某种依赖关系注入到对象之中。
+## Spring Bean的生命周期
+- bean的后置处理器，一共七步
+  - 1. 通过构造器创建bean示例（无参数构造）
+  - 2. 为bean的属性设置值和对其他bean引用（调用set方法）
+  - 3. 把bean实例传递bean后置处理器的方法：postProcessBeforeInitialization()
+  - 4. 调用bean的初始化的方法（需要进行配置初始化的方法）
+  - 5. 把bean实例传递bean后置处理器的方法：postProcessAfterInitialization()
+  - 6. bean可以使用了（对象获取到了）
+  - 7. 当容器关闭时，调用bean的销毁方法（需要进行配置销毁的方法）
 
 ## Spring 的AOP
 - 面向切面编程，利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重复性，同时提高了开发的效率。
