@@ -27,6 +27,12 @@ IOC思想基于IOC容器完成，IOC容器底层就是对象工厂，实际上�
       - ApplicationContext实现类：
 - 依赖注入
 “获得依赖对象的过程被反转了”。控制被反转之后，获得依赖对象的过程由自身管理变为了由IOC容器主动注入。依赖注入是实现IOC的方法，就是由IOC容器在运行期间，动态地将某种依赖关系注入到对象之中。
+
+## Spring 启动过程ApplicationContext，也就是IOC容器的初始化过程
+
+![springIOC过程.jpg](../pic/springIOC过程.jpg)
+
+
 ## Spring Bean的生命周期
 - bean的后置处理器，一共七步
   - 1. 通过构造器创建bean示例（无参数构造）
@@ -36,6 +42,9 @@ IOC思想基于IOC容器完成，IOC容器底层就是对象工厂，实际上�
   - 5. 把bean实例传递bean后置处理器的方法：postProcessAfterInitialization()
   - 6. bean可以使用了（对象获取到了）
   - 7. 当容器关闭时，调用bean的销毁方法（需要进行配置销毁的方法）
+
+![bean生命周期细化](../pic/bean生命周期细化.jpg)
+
 
 - 自定义初始化和销毁方法
   - 1. 通过@Bean指定init-method和destroy-method
@@ -106,9 +115,7 @@ Spring4----》Spring5 AOP执行顺序发生了变化,也就是SpringBoot1----》
 
 ![SpringAOP执行顺序对比](../pic/SpringAOP执行顺序对比.png)
 
-
-## Spring 启动过程ApplicationContext
-
+Spring 注解学习视频：https://www.bilibili.com/video/BV1gW411W7wy?p=39
 
 
 ## Spring的循环依赖
