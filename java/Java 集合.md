@@ -40,7 +40,7 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 对于排序二叉树的创建，其添加节点的过程如下：
 1. 以根节点为初始节点进行检索。
 2. 与当前节点进行比对，若新增节点值较大，则以当前节点的右子节点作为新的当前节点。否则以当前节点的左子节点作为新的当前节点。
-3. 循环递归2步骤知道检索出合适的叶子节点为止。
+3. 循环递归2步骤直到检索出合适的叶子节点为止。
 4. 将新增节点与3步骤中找到的节点进行比对，如果新增节点较大，则添加为右子节点；否则添加为左子节点。
 
 ### delete()
@@ -56,6 +56,8 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 
 ## ConcurrentHashMap
 - ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
+[ConcurrentHashMap相信看完这篇没人能难住你](./pic/ConcurrentHashMap相信看完这篇没人能难住你.png)
+
 https://www.cnblogs.com/zhaojj/p/8942647.html
 
 * JDK 1.7 使用分段锁机制来实现并发更新操作，核心类为 Segment，它继承自重入锁 ReentrantLock，并发度与 Segment 数量相等。
