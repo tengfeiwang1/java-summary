@@ -101,6 +101,8 @@
 [AQS源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
 
 >> LockSupport是AQS的底层线程实现类
+- todo 查看视频，记录笔记
+[[AQS源码解析](https://www.bilibili.com/video/BV1Hy4y1B78T?p=16)
 
 ## JUC下的同步器
   1. ReentrantLock-独享模式
@@ -169,7 +171,7 @@ java.util.concurrent.BlockingQueue 接口有以下阻塞队列的实现：
 内部是通过一个可重入锁ReentrantLock和两个Condition条件对象来实现阻塞，所以ArrayBlockingQueue中的元素存在公平访问与非公平访问的区别
 
 **LinkedBlockingQueue**: 一个由链表实现的有界队列阻塞队列，需要设置长度，不然默认值为Integer.MAX_VALUE会造成机器负载或者内存爆满等情况。
-链接队列的吞吐量要高于基于数组的队列（ArrayBlockingQueue），因为其内部实现添加和删除操作使用的两个ReentrantLock(putLock,takeLock)来控制并发执行，而ArrayBlockingQueue内部只是使用一个ReenterLock控制并发，因此LinkedBlockingQueue的吞吐量要高于ArrayBlockingQueue.
+链表队列的吞吐量要高于基于数组的队列（ArrayBlockingQueue），因为其内部实现添加和删除操作使用的两个ReentrantLock(putLock,takeLock)来控制并发执行，而ArrayBlockingQueue内部只是使用一个ReenterLock控制并发，因此LinkedBlockingQueue的吞吐量要高于ArrayBlockingQueue.
 
 **PriorityBlockingQueue**: 优先级队列 
 
