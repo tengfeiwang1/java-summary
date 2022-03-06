@@ -95,7 +95,7 @@ min.insync.replicas: 设置为>=2,保证ISR中至少两个Replica。
 #### 存储策略
 无论消息是否被消费，kafka都会保存所有的消息。那对于旧数据有什么删除策略呢？
 1. 基于时间，默认配置是168小时（7天）。
-2. 基于大小，默认配置是1073741824。
+2. 基于大小，默认配置是1073741824。--新版kafka是-1，不再根据文件大小删除数据
 　　需要注意的是，kafka读取特定消息的时间复杂度是O(1)，所以这里删除过期的文件并不会提高kafka的性能！
 
 ### 消费数据
@@ -110,7 +110,7 @@ min.insync.replicas: 设置为>=2,保证ISR中至少两个Replica。
 1. 先找到offset的368801message所在的segment文件（利用二分法查找），这里找到的就是在第二个segment文件。
 2. 打开找到的segment中的.index文件（也就是368796.index文件，该文件起始偏移量为368796+1，我们要查找的offset为368801的message在该index内的偏移量为368796+5=368801，所以这里要查找的相对offset为5）。由于该文件采用的是**稀疏索引的方式存储着相对offset**及对应message物理偏移量的关系，所以直接找**相对offset**为5的索引找不到，这里同样利用二分法查找相对offset小于或者等于指定的相对offset的索引条目中**最大的那个相对offset**，所以找到的是相对offset为4的这个索引。
 3. 根据找到的相对offset为4的索引确定message存储的物理偏移位置为256。打开数据文件，从位置为256的那个地方开始顺序扫描直到找到offset为368801的那条Message。
->> tips: 这套机制是建立在offset为有序的基础上，利用**segment+有序offset+稀疏索引+二分查找+顺序查找**等多种手段来高效的查找数据！至此，消费者就能拿到需要处理的数据进行处理了。那每个消费者又是怎么记录自己消费的位置呢？在早期的版本中，消费者将消费到的offset维护zookeeper中，consumer每间隔一段时间上报一次，这里容易导致重复消费，且性能不好！在新的版本中消费者消费到的offset已经直接维护在kafk集群的__consumer_offsets这个topic中！
+>> tips: 这套机制是建立在offset为有序的基础上，利用**segment+有序offset+稀疏索引+二分查找+顺序查找**等多种手段来高效的查找数据！至此，消费者就能拿到需要处理的数据进行处理了。那每个消费者又是怎么记录自己消费的位置呢？在早期的版本中，消费者将消费到的offset维护zookeeper中，consumer每间隔一段时间上报一次，这里容易导致重复消费，且性能不好！在新的版本中消费者消费到的offset已经直接维护在kafka集群的__consumer_offsets这个topic中！
 
 ## Zookeeper在kafka中作用
  1.broker注册；2.topic注册；3.生产者负载均衡；4.消费者信息；5.消费者和分区关系；6.消费者负载均衡；7.消费者offset提交（high level api，0.11版本转移到kafka的consumer_offset topic）
@@ -152,9 +152,10 @@ On restart restore the position of the consumer using seek(TopicPartition, long)
 ### 点对点模式
 ![点对点模式](../java/pic/点对点模式.png)
 >>  如上图所示，点对点模式通常是基于**拉取或者轮询**的消息传送模型，这个模型的特点是发送到队列的消息被一个且只有一个消费者进行处理。生产者将消息放入消息队列后，由消费者主动的去拉取消息进行消费。点对点模型的的优点是消费者拉取消息的频率可以由自己控制。但是消息队列是否有消息需要消费，在消费者端无法感知，所以在消费者端需要额外的线程去监控。
+Kafka采用的是**点对点的模式**
 ### 发布订阅模式
 ![发布订阅模式](../java/pic/发布订阅模式.png)
->> 如上图所示，发布订阅模式是一个基于消息送的消息传送模型，改模型可以有多种不同的订阅者。生产者将消息放入消息队列后，队列会将消息推送给订阅过该类消息的消费者（类似微信公众号）。
+>> 如上图所示，发布订阅模式是一个基于消息的消息传送模型，该模型可以有多种不同的订阅者。生产者将消息放入消息队列后，队列会将消息推送给订阅过该类消息的消费者（类似微信公众号）。
 由于是消费者被动接收推送，所以无需感知消息队列是否有待消费的消息！但是consumer1、consumer2、consumer3由于机器性能不一样，所以处理消息的能力也会不一样，但消息队列却无法感知消费者消费的速度！所以推送的速度成了发布订阅模模式的一个问题！假设三个消费者处理速度分别是8M/s、5M/s、2M/s，如果队列推送的速度为5M/s，则consumer3无法承受！如果队列推送的速度为2M/s，则consumer1、consumer2会出现资源的极大浪费！
 
 
@@ -188,7 +189,7 @@ consumer
     Kafka内部会自动为每个Producer分配一个producer id(PID)，broker端会为producer每个Partition维护一个<PID,Partition> -> sequence number映射。sequence number时从0开始单调递增的。
 
 对于新接受到的消息，broker端会进行如下判断：
-1.如果新消息的sequence number正好是broker端维护的<PID,Partition> -> sequence number大1，说broker会接受处理这条消息。
+1.如果新消息的sequence number正好是broker端维护的<PID,Partition> -> sequence number大1，broker会接受处理这条消息。
 2.如果新消息的sequence number比broker端维护的sequence number要小，说明时重复消息，broker可以将其直接丢弃
 3.如果新消息的sequence number比broker端维护的sequence number要大过1，说明中间存在了丢数据的情况，那么会响应该情况，对应的Producer会抛出OutOfOrderSequenceException。
 

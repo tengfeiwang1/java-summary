@@ -45,5 +45,6 @@ ZooKeeper 是高性能的(但不是高可用的:网络抖动，宕机等)。 在
 
 [paxos raft](https://www.cnblogs.com/zhang-qc/p/8688258.html)
 
+[选举机制](https://segmentfault.com/a/1190000039385874)
 ## api应用
 https://www.cnblogs.com/qingyunzong/p/8666288.html
