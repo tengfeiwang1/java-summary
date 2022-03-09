@@ -1,46 +1,46 @@
-- [介绍](#%E4%BB%8B%E7%BB%8D)
-- [内部机制解析](#%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E8%A7%A3%E6%9E%90)
-  - [节点类型](#%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B)
-  - [理解索引（index）](#%E7%90%86%E8%A7%A3%E7%B4%A2%E5%BC%95index)
-  - [理解分片(shard)](#%E7%90%86%E8%A7%A3%E5%88%86%E7%89%87shard)
-    - [Zen Discovery & Gossip 算法](#zen-discovery--gossip-%E7%AE%97%E6%B3%95)
-  - [写操作](#%E5%86%99%E6%93%8D%E4%BD%9C)
+- [介绍](#介绍)
+- [内部机制解析](#内部机制解析)
+  - [节点类型](#节点类型)
+  - [理解索引（index）](#理解索引index)
+  - [理解分片(shard)](#理解分片shard)
+    - [Zen Discovery & Gossip 算法](#zen-discovery--gossip-算法)
+  - [写操作](#写操作)
     - [TransLog](#translog)
-      - [TransLog Settings（持久化策略配置）：](#translog-settings%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5%E9%85%8D%E7%BD%AE)
-      - [Flush Settings（TransLog清洗配置）：](#flush-settingstranslog%E6%B8%85%E6%B4%97%E9%85%8D%E7%BD%AE)
-    - [ES 如何写 replicas？](#es-%E5%A6%82%E4%BD%95%E5%86%99-replicas)
-  - [更新 & 删除文档操作](#%E6%9B%B4%E6%96%B0--%E5%88%A0%E9%99%A4%E6%96%87%E6%A1%A3%E6%93%8D%E4%BD%9C)
-  - [读操作](#%E8%AF%BB%E6%93%8D%E4%BD%9C)
-    - [查询阶段](#%E6%9F%A5%E8%AF%A2%E9%98%B6%E6%AE%B5)
-      - [读主分片 or 读副本](#%E8%AF%BB%E4%B8%BB%E5%88%86%E7%89%87-or-%E8%AF%BB%E5%89%AF%E6%9C%AC)
-    - [聚合提取阶段](#%E8%81%9A%E5%90%88%E6%8F%90%E5%8F%96%E9%98%B6%E6%AE%B5)
-- [并发策略](#%E5%B9%B6%E5%8F%91%E7%AD%96%E7%95%A5)
-  - [并发策略之悲观锁](#%E5%B9%B6%E5%8F%91%E7%AD%96%E7%95%A5%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81)
-  - [并发策略之乐观并发控制](#%E5%B9%B6%E5%8F%91%E7%AD%96%E7%95%A5%E4%B9%8B%E4%B9%90%E8%A7%82%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6)
-- [ES和Lucene的结合](#es%E5%92%8Clucene%E7%9A%84%E7%BB%93%E5%90%88)
+      - [TransLog Settings（持久化策略配置）：](#translog-settings持久化策略配置)
+      - [Flush Settings（TransLog清洗配置）：](#flush-settingstranslog清洗配置)
+    - [ES 如何写 replicas？](#es-如何写-replicas)
+  - [更新 & 删除文档操作](#更新--删除文档操作)
+  - [读操作](#读操作)
+    - [查询阶段](#查询阶段)
+      - [读主分片 or 读副本](#读主分片-or-读副本)
+    - [聚合提取阶段](#聚合提取阶段)
+- [并发策略](#并发策略)
+  - [并发策略之悲观锁](#并发策略之悲观锁)
+  - [并发策略之乐观并发控制](#并发策略之乐观并发控制)
+- [ES和Lucene的结合](#es和lucene的结合)
   - [Shard](#shard)
     - [Segments](#segments)
     - [Type or Index](#type-or-index)
-    - [_source & _all & _field_names字段](#source--all--fieldnames%E5%AD%97%E6%AE%B5)
-    - [doc_value](#docvalue)
-  - [拓展---时间序列数据库（TSDB）](#%E6%8B%93%E5%B1%95---%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%95%B0%E6%8D%AE%E5%BA%93tsdb)
-- [索引](#%E7%B4%A2%E5%BC%95)
+    - [_source & _all & _field_names字段](#_source--_all--_field_names字段)
+    - [doc_value](#doc_value)
+  - [拓展---时间序列数据库（TSDB）](#拓展---时间序列数据库tsdb)
+- [索引](#索引)
   - [Term Index](#term-index)
   - [Term Dictionary](#term-dictionary)
   - [Posting List](#posting-list)
-- [评分](#%E8%AF%84%E5%88%86)
-  - [布尔模型](#%E5%B8%83%E5%B0%94%E6%A8%A1%E5%9E%8B)
-  - [词频/逆向文档频率(TF/IDF)-默认](#%E8%AF%8D%E9%A2%91%E9%80%86%E5%90%91%E6%96%87%E6%A1%A3%E9%A2%91%E7%8E%87tfidf-%E9%BB%98%E8%AE%A4)
-    - [向量空间模型](#%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4%E6%A8%A1%E5%9E%8B)
-- [总结和思考](#%E6%80%BB%E7%BB%93%E5%92%8C%E6%80%9D%E8%80%83)
-  - [模板](#%E6%A8%A1%E6%9D%BF)
+- [评分](#评分)
+  - [布尔模型](#布尔模型)
+  - [词频/逆向文档频率(TF/IDF)-默认](#词频逆向文档频率tfidf-默认)
+    - [向量空间模型](#向量空间模型)
+- [总结和思考](#总结和思考)
+  - [模板](#模板)
   - [query](#query)
   - [agg](#agg)
   - [script](#script)
   - [search after](#search-after)
   - [scroll](#scroll)
-  - [优化](#%E4%BC%98%E5%8C%96)
-    - [写入](#%E5%86%99%E5%85%A5)
+  - [优化](#优化)
+    - [写入](#写入)
     - [](#)
 
 # 介绍
@@ -126,7 +126,7 @@ shard = hash(document_id or routing parameter) % (num_of_primary_shards)
 ```
 而主分片本身是分散在集群各个机器之中的，这里就相当于一次**主分片的LB**。
 2. 接下来都是在 shard 中进行操作了，先是写入 **Transaction Log**(后续会有详细介绍)，而后将数据写入**内存**中，默认情况下每隔一秒会同步到 **FileSystem cache** 中，FS Cache 拥有文件句柄，因此存在于 FS cache 中的数据是允许被搜索到的（ready for search），这也是 ES 能够实现 NRT（Near-Real-Time）这个特性的原因之一。当然对数据实时性要求高的可以调用 Refresh API。
-默认情况下每隔30s 会将FS cache中的 index以及 Transaction Log一并写入磁盘中，当然为了降低数据丢失的概率，可以将这个时间缩短，甚至设置成同步的形式。
+默认情况下每隔30s 会将FS cache中的 index以及 Transaction Log一并写入磁盘（segment）中，当然为了降低数据丢失的概率，可以将这个时间缩短，甚至设置成同步的形式。
 
 ### TransLog
 TransLog （即所谓的写前日志WAL，Write Ahead Log）的机制与 MySQL 的 binlog，HBase 的 Hlog 并无太大差别。TransLog 本身是写入到FS cache 的，什么时候 fsync 到磁盘取决于数据能接受丢失的程度。
@@ -385,7 +385,7 @@ in-memory-buffer   -->> translog --> segment -->commit point
 
 ![term结构图](../java/pic/termindex.png)
 ## Term Index
-B-Tree通过减少磁盘寻道次数来提高查询性能，Elasticsearch也是采用同样的思路，直接通过内存查找term，不读磁盘，但是如果term太多，term dictionary也会很大，放内存不现实，于是有了Term Index，就像字典里的索引页一样，A开头的有哪些term，分别在哪页，可以理解term index是一颗树(**teri tree**)：这棵树不会包含所有的term，它包含的是term的一些前缀。通过term index可以快速地定位到term dictionary的某个offset，然后从这个位置再往后顺序查找。
+B-Tree通过减少磁盘寻道次数来提高查询性能，Elasticsearch也是采用同样的思路，直接通过内存查找term，不读磁盘，但是如果term太多，term dictionary也会很大，放内存不现实，于是有了Term Index，就像字典里的索引页一样，A开头的有哪些term，分别在哪页，可以理解term index是一颗树(**Trie tree**)：这棵树不会包含所有的term，它包含的是term的一些前缀。通过term index可以快速地定位到term dictionary的某个offset，然后从这个位置再往后顺序查找。
 所以term index不需要存下所有的term，而仅仅是他们的一些*前缀与Term Dictionary的block之间的映射关系*，再结合FST(Finite State Transducers)的压缩技术，可以使term index缓存到内存中。从term index查到对应的term dictionary的block位置之后，再去磁盘上找term，大大减少了磁盘随机读的次数。
 ## Term Dictionary
 Elasticsearch为了能快速找到某个term，将所有的term排个序，二分法查找term，logN的查找效率，就像通过字典查找一样，这就是Term Dictionary。
@@ -483,7 +483,7 @@ https://www.bbsmax.com/A/mo5kY2QzwR/
   "index":{
     "code":"best_compression",//压缩算法
     "number_of_replicas":0,//备份
-    "refresh_interval":"120s,"//刷新周期
+    "refresh_interval":"120s",//刷新周期
     "number_of_shards":"10", //分片数
     "max_result_window":"100000", //bulk队列最大数量
     "translog": {
