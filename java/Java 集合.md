@@ -58,6 +58,10 @@ accessOrder 为 true时:当一个节点被访问时，则会将该节点移到�
 - ConcurrentHashMap  http://ifeve.com/hashmap-concurrenthashmap-相信看完这篇没人能难住你%ef%bc%81/
 [ConcurrentHashMap相信看完这篇没人能难住你](./pic/ConcurrentHashMap相信看完这篇没人能难住你.png)
 
+上边图片看不清楚，这里使用pdf
+https://cloud.tencent.com/developer/article/1188023
+[ConcurrentHashMap相信看完这篇没人能难住你](./pic/ConcurrentHashMap相信看完这篇没人能难住你.pdf)
+
 https://www.cnblogs.com/zhaojj/p/8942647.html
 
 * JDK 1.7 使用分段锁机制来实现并发更新操作，核心类为 Segment，它继承自重入锁 ReentrantLock，并发度与 Segment 数量相等。
@@ -98,3 +102,8 @@ f 即为当前 key 定位出的 Node，如果为空表示当前位置可以写�
 7. 如果在遍历过程中找到 key 相同时直接退出遍历。
 8. 如果 e != null 就相当于存在相同的 key,那就需要将值覆盖。
 9. 最后判断是否需要进行扩容。
+
+
+
+## AQS--必考重点
+[参考资料   ](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/aqs.md)
