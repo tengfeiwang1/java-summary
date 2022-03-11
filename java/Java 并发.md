@@ -111,6 +111,7 @@ AQS = state + CLH队列
 - todo 查看视频，记录笔记
 
 [[AQS源码解析](https://www.bilibili.com/video/BV1Hy4y1B78T?p=16)
+[根据视频整理的笔记](https://blog.csdn.net/TZ845195485/article/details/109210095)
 
 ## JUC下的同步器
   1. ReentrantLock-独享模式
