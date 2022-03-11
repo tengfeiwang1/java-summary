@@ -105,5 +105,4 @@ f 即为当前 key 定位出的 Node，如果为空表示当前位置可以写�
 
 
 
-## AQS--必考重点
-[参考资料   ](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/aqs.md)
+## AQS--必考重点 [参考Java并发--AQS]

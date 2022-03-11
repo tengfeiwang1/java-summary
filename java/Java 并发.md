@@ -59,6 +59,11 @@
 # 并发包(J.U.C)
 ![参考文档](./pri/知识点20181126.docx)
 ## AQS--AbstractQueuedSynchronizer
+AQS = state + CLH队列
+
+[参考基础资料](https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/concurrent/aqs.md)
+[尚硅谷面试第三季整理的笔记](https://iridescent-english-b5d.notion.site/2021-Java-java-dc6997437ba3471c8d92f0165ec333c0#c34b3b39abc24c028b38617c7c0cf3c9)
+
 ### 框架
 ![CLH队列(FIFO)](./pic/CLH队列(FIFO).png)
   它维护了一个**volatile int state（代表共享资源）**和一个FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）。这里volatile是核心关键词，具有volatile的语义，在此不述。state的访问方式有三种:
@@ -100,8 +105,11 @@
 ### AQS源码详解
 [AQS源码分析参考链接](http://www.cnblogs.com/waterystone/p/4920797.html)
 
+
+
 >> LockSupport是AQS的底层线程实现类
 - todo 查看视频，记录笔记
+
 [[AQS源码解析](https://www.bilibili.com/video/BV1Hy4y1B78T?p=16)
 
 ## JUC下的同步器
