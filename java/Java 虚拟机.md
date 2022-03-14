@@ -29,6 +29,9 @@
 [详解](https://www.cnblogs.com/dingyingsi/p/3760447.html-->http://www.yaowenming.com/A/6pdDRBGXJw/)
 [元空间详解](https://blog.csdn.net/zhushuai1221/article/details/52122880)
 
+
+[写代码实现堆溢出、栈溢出、永久代溢出、直接内存溢出](https://blog.csdn.net/u011983531/article/details/63250882)
+
 ## JVM内存分配比例
 老年代默认2/3
 新生代1/3 （eden：80%，survivor0：10%，survivor1:10%）
